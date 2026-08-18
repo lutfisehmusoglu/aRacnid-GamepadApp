@@ -1,6 +1,6 @@
 param(
     [ValidatePattern('^\d+\.\d+\.\d+$')]
-    [string]$Version = '1.0.0',
+    [string]$Version = '1.0.1',
     [switch]$SkipInstaller
 )
 
@@ -78,13 +78,27 @@ if (Test-Path -LiteralPath $portableZip) {
     Remove-Item -LiteralPath $portableZip -Force
 }
 
-Compress-Archive `
-    -Path (Join-Path $publishDirectory '*') `
-    -DestinationPath $portableZip `
-    -CompressionLevel Optimal `
-    -Force
+$zipCreated = $false
+for ($attempt = 1; $attempt -le 10; $attempt++) {
+    try {
+        Compress-Archive `
+            -Path (Join-Path $publishDirectory '*') `
+            -DestinationPath $portableZip `
+            -CompressionLevel Optimal `
+            -Force
+        $zipCreated = $true
+        break
+    }
+    catch {
+        if ($attempt -eq 10) {
+            throw
+        }
 
-if (-not (Test-Path -LiteralPath $portableZip)) {
+        Start-Sleep -Milliseconds 500
+    }
+}
+
+if (-not $zipCreated -or -not (Test-Path -LiteralPath $portableZip)) {
     throw "Portable ZIP oluşturulamadı: $portableZip"
 }
 
@@ -117,6 +131,11 @@ $releaseFiles = @()
 
 if (Test-Path -LiteralPath $portableZip) {
     $releaseFiles += $portableZip
+}
+$installerFile = Join-Path $installerDirectory (
+    "aRacnid-GamepadApp-Setup-$Version-x64.exe")
+if (Test-Path -LiteralPath $installerFile) {
+    $releaseFiles += $installerFile
 }
 $hashFile = Join-Path $artifactsRoot 'SHA256SUMS.txt'
 $hashLines = foreach ($file in $releaseFiles) {

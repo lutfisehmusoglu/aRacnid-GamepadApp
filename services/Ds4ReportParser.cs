@@ -19,12 +19,14 @@ public static class Ds4ReportParser
         state = new PhysicalGamepadState();
 
         int offset;
+        bool hasBattery;
 
         if (transport == Ds4InputTransport.Usb &&
             report.Length >= 64 &&
             report[0] == 0x01)
         {
             offset = 0;
+            hasBattery = true;
         }
         else if (transport == Ds4InputTransport.Bluetooth &&
                  report.Length >= 78 &&
@@ -42,13 +44,26 @@ public static class Ds4ReportParser
             // iki bayt sonra başlar. USB ile aynı parser bu offset
             // üzerinden çalışır.
             offset = 2;
+            hasBattery = true;
+        }
+        else if (transport == Ds4InputTransport.Bluetooth &&
+                 report.Length >= 10 &&
+                 report[0] == 0x01)
+        {
+            // Gerçek DS4 Bluetooth bağlantısı enhanced 0x11 moduna
+            // geçmeden 10 baytlık minimal 0x01 input üretebilir. Windows HID
+            // bu raporu cihazın 547 baytlık maksimum rapor uzunluğuna sıfırla
+            // doldurabilir. Kontrol alanları USB ile aynı başlangıçtadır;
+            // minimal framing pil alanını içermez.
+            offset = 0;
+            hasBattery = false;
         }
         else
         {
             return false;
         }
 
-        if (report.Length <= offset + 30)
+        if (report.Length <= offset + 9)
             return false;
 
         state.IsConnected = true;
@@ -88,13 +103,16 @@ public static class Ds4ReportParser
         state.PsPressed = (systemButtons & 0x01) != 0;
         state.TouchpadPressed = (systemButtons & 0x02) != 0;
 
-        int batteryLevel = report[offset + 30] & 0x0F;
-        state.BatteryPercentage = batteryLevel switch
+        if (hasBattery)
         {
-            <= 10 => batteryLevel * 10,
-            11 => 100,
-            _ => null
-        };
+            int batteryLevel = report[offset + 30] & 0x0F;
+            state.BatteryPercentage = batteryLevel switch
+            {
+                <= 10 => batteryLevel * 10,
+                11 => 100,
+                _ => null
+            };
+        }
 
         return true;
     }

@@ -68,13 +68,13 @@ The application filters its own ViGEm virtual devices so they cannot be detected
 The recommended version is the Windows installer from **GitHub Releases**:
 
 ```text
-aRacnid-GamepadApp-Setup-1.0.0-x64.exe
+aRacnid-GamepadApp-Setup-1.0.1-x64.exe
 ```
 
 A portable package is also available:
 
 ```text
-aRacnid-GamepadApp-1.0.0-win-x64-portable.zip
+aRacnid-GamepadApp-1.0.1-win-x64-portable.zip
 ```
 
 Release downloads are accompanied by:
@@ -113,7 +113,7 @@ The required .NET runtime files are included with the application.
 1. Download and run:
 
    ```text
-   aRacnid-GamepadApp-Setup-1.0.0-x64.exe
+   aRacnid-GamepadApp-Setup-1.0.1-x64.exe
    ```
 
 2. Complete the installer.
@@ -301,8 +301,8 @@ The project includes an automated input and regression test suite.
 Current validated result:
 
 ```text
-Normal tests:     27 / 27
-Live ViGEm tests: 28 / 28
+Normal tests:     28 / 28
+Live ViGEm tests: 29 / 29
 ```
 
 The tests cover areas including:
@@ -332,7 +332,7 @@ The `--live` test additionally creates real ViGEm virtual DS4 and Xbox targets a
 
 ### Hardware validation
 
-The DualShock 4 path has received physical hardware testing.
+The DualShock 4 USB and Bluetooth paths have received physical hardware testing.
 
 DualSense, Nintendo and Logitech support is implemented and covered by code / automated validation, but physical testing is still recommended for every supported model and connection type.
 
@@ -393,7 +393,7 @@ dotnet run --project tests\GamepadApp.InputTests\GamepadApp.InputTests.csproj -c
 The release script generates a self-contained `win-x64` build.
 
 ```powershell
-.\scripts\build-release.ps1 -Version 1.0.0
+.\scripts\build-release.ps1 -Version 1.0.1
 ```
 
 The script produces:
@@ -401,8 +401,8 @@ The script produces:
 ```text
 artifacts\
 ├── installer\
-│   └── aRacnid-GamepadApp-Setup-1.0.0-x64.exe
-├── aRacnid-GamepadApp-1.0.0-win-x64-portable.zip
+│   └── aRacnid-GamepadApp-Setup-1.0.1-x64.exe
+├── aRacnid-GamepadApp-1.0.1-win-x64-portable.zip
 ├── SHA256SUMS.txt
 └── publish\
 ```
@@ -410,7 +410,7 @@ artifacts\
 If Inno Setup is not installed:
 
 ```powershell
-.\scripts\build-release.ps1 -Version 1.0.0 -SkipInstaller
+.\scripts\build-release.ps1 -Version 1.0.1 -SkipInstaller
 ```
 
 ---
@@ -478,7 +478,7 @@ See [LICENSE](LICENSE) for the full license text.
 
 ## Status
 
-**aRacnid GamepadApp 1.0.0**
+**aRacnid GamepadApp 1.0.1**
 
 Windows x64  
 Self-contained release  

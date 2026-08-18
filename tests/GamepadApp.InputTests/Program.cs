@@ -11,6 +11,7 @@ var tests = new (string Name, Action Body)[]
     ("DS4 USB neutral report", TestDs4UsbNeutral),
     ("DS4 USB buttons, axes and battery", TestDs4UsbButtonsAxesBattery),
     ("DS4 Bluetooth normalization", TestDs4BluetoothNormalization),
+    ("DS4 Bluetooth padded minimal framing", TestDs4BluetoothMinimalFraming),
     ("DS4 Bluetooth integrity checks", TestDs4BluetoothIntegrity),
     ("DS4 wireless adapter disconnect bit", TestDs4WirelessAdapterDisconnect),
     ("DS4 malformed reports rejected", TestDs4MalformedReports),
@@ -186,6 +187,40 @@ static void TestDs4BluetoothNormalization()
     SetEqual(usbState.Buttons, bluetoothState.Buttons);
 }
 
+static void TestDs4BluetoothMinimalFraming()
+{
+    // Gerçek HidSharp okumasından gözlenen framing: 10 baytlık 0x01 input,
+    // cihazın maksimum input rapor uzunluğu olan 547 bayta sıfır padding.
+    byte[] report = new byte[547];
+    report[0] = 0x01;
+    report[1] = 128;
+    report[2] = 127;
+    report[3] = 128;
+    report[4] = 121;
+    report[5] = 0x28; // Cross + neutral D-pad.
+    report[6] = 0x02; // R1.
+    report[7] = 0x03; // PS + touchpad.
+    report[8] = 17;
+    report[9] = 231;
+
+    Assert(Ds4ReportParser.TryParse(
+        report,
+        Ds4InputTransport.Bluetooth,
+        12,
+        out PhysicalGamepadState state));
+
+    Equal(12L, state.SequenceNumber);
+    Equal((byte)128, state.LeftStickX);
+    Equal((byte)127, state.LeftStickY);
+    Equal((byte)128, state.RightStickX);
+    Equal((byte)121, state.RightStickY);
+    Equal((byte)17, state.LeftTrigger);
+    Equal((byte)231, state.RightTrigger);
+    Equal<int?>(null, state.BatteryPercentage);
+    Assert(state.PsPressed && state.TouchpadPressed);
+    SetEqual(new[] { "Cross", "R1" }, state.Buttons);
+}
+
 static void TestDs4BluetoothIntegrity()
 {
     byte[] report = new byte[78];
@@ -221,12 +256,8 @@ static void TestDs4BluetoothIntegrity()
     Assert(!Ds4ReportParser.TryParse(
         report, Ds4InputTransport.Bluetooth, 4, out _));
 
-    byte[] paddedMinimalBluetooth = new byte[78];
+    byte[] paddedMinimalBluetooth = new byte[9];
     paddedMinimalBluetooth[0] = 0x01;
-    paddedMinimalBluetooth[1] = 128;
-    paddedMinimalBluetooth[2] = 128;
-    paddedMinimalBluetooth[3] = 128;
-    paddedMinimalBluetooth[4] = 128;
     Assert(!Ds4ReportParser.TryParse(
         paddedMinimalBluetooth,
         Ds4InputTransport.Bluetooth,
