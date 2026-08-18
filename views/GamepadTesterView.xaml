@@ -1,0 +1,689 @@
+<UserControl x:Class="GamepadApp.Views.GamepadTesterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008">
+
+    <Viewbox Stretch="Uniform"
+             Margin="20">
+        <Canvas x:Name="TesterCanvas"
+                Width="1536"
+                Height="1536">
+
+            <Image x:Name="BaseControllerImage"
+                   Source="pack://application:,,,/assets/controller_tester_base.png"
+                   Width="1536"
+                   Height="1536"
+                   Panel.ZIndex="0"
+                   IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+            <Canvas x:Name="Ds4HighlightLayer"
+        Panel.ZIndex="1">
+
+                <Path x:Name="L2Highlight"
+                   Width="190"
+                   Height="125"
+                   Canvas.Left="260"
+                   Canvas.Top="177"
+                   Fill="White"
+                   Opacity="0"
+                   Stretch="Fill"
+                   Data="M 6,96 Q 50,90 94,96 C 90,40 75,0 50,0 C 25,0 10,40 6,96 Z"/>
+
+                <Path x:Name="R2Highlight"
+                  Width="190"
+                  Height="125"
+                  Canvas.Left="1085"
+                  Canvas.Top="177"
+                  Fill="White"
+                  Opacity="0"
+                  Stretch="Fill"
+                  Data="M 6,96 Q 50,90 94,96 C 90,40 75,0 50,0 C 25,0 10,40 6,96 Z"/>
+
+                <Border x:Name="L1Highlight"
+                    Width="184"
+                    Height="65"
+                    Canvas.Left="257"
+                    Canvas.Top="332"
+                    Background="White"
+                    CornerRadius="26"
+                    Opacity="0"/>
+
+                <Border x:Name="R1Highlight"
+                    Width="183"
+                    Height="65"
+                    Canvas.Left="1094"
+                    Canvas.Top="332"
+                    Background="White"
+                    CornerRadius="26"
+                    Opacity="0"/>
+
+                <Ellipse x:Name="L3Highlight"
+                     Width="123"
+                     Height="123"
+                     Canvas.Left="482"
+                     Canvas.Top="801"
+                     Fill="White"
+                     Opacity="0" RenderTransformOrigin="2.006,2.537" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+                <Ellipse x:Name="R3Highlight"
+                     Width="123"
+                     Height="123"
+                     Canvas.Left="928"
+                     Canvas.Top="801"
+                     Fill="White"
+                     Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+
+                <!-- FACE BUTTON HIGHLIGHTS -->
+
+                <Ellipse x:Name="TriangleHighlight"
+         Width="94"
+         Height="93"
+         Canvas.Left="1160"
+         Canvas.Top="533"
+         Fill="#00A651"
+         Opacity="0"
+         Panel.ZIndex="1"/>
+
+                <Ellipse x:Name="CircleHighlight"
+         Width="93"
+         Height="92"
+         Canvas.Left="1254"
+         Canvas.Top="624"
+         Fill="#ED1C24"
+         Opacity="0"
+         Panel.ZIndex="1"/>
+
+                <Ellipse x:Name="CrossHighlight"
+         Width="93"
+         Height="92"
+         Canvas.Left="1161"
+         Canvas.Top="712"
+         Fill="#00AEEF"
+         Opacity="0"
+         Panel.ZIndex="1"/>
+
+                <Ellipse x:Name="SquareHighlight"
+         Width="93"
+         Height="93"
+         Canvas.Left="1072"
+         Canvas.Top="623"
+         Fill="#EC008C"
+         Opacity="0"
+         Panel.ZIndex="1"/>
+
+                <Path x:Name="DpadUpHighlight"
+                  Width="73"
+                  Height="100"
+                  Canvas.Left="293"
+                  Canvas.Top="555"
+                  Fill="White"
+                  Opacity="0"
+                  Stretch="Fill"
+                  Stroke="White"
+                  StrokeThickness="6"
+                  StrokeLineJoin="Round"
+                  Data="M 0,0 L 100,0 L 100,65 L 50,100 L 0,65 Z"/>
+
+                <Path x:Name="DpadDownHighlight"
+                  Width="73"
+                  Height="93"
+                  Canvas.Left="293"
+                  Canvas.Top="680"
+                  Fill="White"
+                  Opacity="0"
+                  Stretch="Fill"
+                  Stroke="White"
+                  StrokeThickness="6"
+                  StrokeLineJoin="Round"
+                  Data="M 0,100 L 100,100 L 100,35 L 50,0 L 0,35 Z"/>
+
+                <Path x:Name="DpadLeftHighlight"
+                  Width="90"
+                  Height="73"
+                  Canvas.Left="219"
+                  Canvas.Top="627"
+                  Fill="White"
+                  Opacity="0"
+                  Stretch="Fill"
+                  Stroke="White"
+                  StrokeThickness="6"
+                  StrokeLineJoin="Round"
+                  Data="M 0,0 L 0,100 L 65,100 L 100,50 L 65,0 Z"/>
+
+                <Path x:Name="DpadRightHighlight"
+                  Width="94"
+                  Height="73"
+                  Canvas.Left="345"
+                  Canvas.Top="627"
+                  Fill="White"
+                  Opacity="0"
+                  Stretch="Fill"
+                  Stroke="White"
+                  StrokeThickness="6"
+                  StrokeLineJoin="Round"
+                  Data="M 100,0 L 100,100 L 35,100 L 0,50 L 35,0 Z"/>
+
+                <!-- SHARE / OPTIONS / PS / TOUCHPAD HIGHLIGHTS -->
+
+                <Border x:Name="ShareHighlight"
+        Width="38"
+        Height="74"
+        Canvas.Left="475"
+        Canvas.Top="497"
+        Background="White"
+        CornerRadius="24"
+        Opacity="0"
+        Panel.ZIndex="1" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+
+                <Border x:Name="OptionsHighlight"
+        Width="37"
+        Height="72"
+        Canvas.Left="1022"
+        Canvas.Top="499"
+        Background="White"
+        CornerRadius="24"
+        Opacity="0"
+        Panel.ZIndex="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <Ellipse x:Name="PSHighlight"
+         Width="70"
+         Height="70"
+         Canvas.Left="732"
+         Canvas.Top="837"
+         Fill="#80FFFFFF"
+         Opacity="0"
+         Panel.ZIndex="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                <Border x:Name="TouchpadHighlight"
+        Width="446"
+        Height="251"
+        Canvas.Left="544"
+        Canvas.Top="465"
+        Background="#55FFFFFF"
+        CornerRadius="30"
+        Opacity="0"
+        Panel.ZIndex="1"/>
+
+            </Canvas>
+
+            <!-- XBOX HIGHLIGHT LAYER -->
+
+            <Canvas x:Name="XboxHighlightLayer"
+                    Visibility="Collapsed"
+                    Panel.ZIndex="1">
+
+                <Canvas x:Name="XboxL2Highlight"
+        Width="125"
+        Height="145"
+        Canvas.Left="329.992"
+        Canvas.Top="275"
+        Opacity="0">
+
+                    <!-- L2 ÜST KISIM -->
+                    <Path Width="84"
+          Height="68"
+          Canvas.Left="19.818"
+          Canvas.Top="1.571"
+          Fill="White"
+          Stretch="Fill"
+          Data="M 10,70
+                C 12,38 18,12 38,3
+                C 50,-2 65,0 74,8
+                C 84,18 87,43 87,70
+                Z" HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform AngleX="-6.899"/>
+                                <RotateTransform/>
+                                <TranslateTransform X="8.422"/>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+                    </Path>
+
+                    <!-- L2 ALT KISIM -->
+                    <Path Width="108"
+          Height="70"
+          Canvas.Left="0"
+          Canvas.Top="52.552"
+          Fill="White"
+          Stretch="Fill"
+          Data="M 28,0
+                L 78,0
+                C 90,2 96,12 98,25
+                L 108,125
+                C 109,138 100,145 88,145
+                L 18,145
+                C 7,145 0,137 2,125
+                L 12,25
+                C 14,11 18,3 28,0
+                Z"
+          RenderTransformOrigin="0.5,0.5">
+
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="0.997"
+                                ScaleX="1.013"/>
+                                <SkewTransform AngleY="-4.218"
+                               AngleX="-6.993"/>
+                                <RotateTransform/>
+                                <TranslateTransform Y="4.226"
+                                    X="4.424"/>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+                    </Path>
+
+                </Canvas>
+
+                <Canvas x:Name="XboxR2Highlight"
+        Width="125"
+        Height="145"
+        Canvas.Left="1078"
+        Canvas.Top="275"
+        Opacity="0">
+
+                    <!-- ÜST KUBBE -->
+                    <Path Width="89"
+          Height="69"
+          Canvas.Left="-2.597"
+          Canvas.Top="-1"
+          Fill="White"
+          Stretch="Fill"
+          Data="M 10,70
+                C 12,38 18,12 38,3
+                C 50,-2 65,0 74,8
+                C 84,18 87,43 87,70
+                Z"
+          RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="-0.998" ScaleY="0.994"/>
+                                <SkewTransform AngleY="-4" AngleX="7.039"/>
+                                <RotateTransform Angle="4"/>
+                                <TranslateTransform X="-4.306"/>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+
+                    </Path>
+
+                    <!-- ALT PARÇA -->
+                    <Path Width="108"
+          Height="70"
+          Canvas.Left="-3"
+          Canvas.Top="52.409"
+          Fill="White"
+          Stretch="Fill"
+          Data="M 28,0
+                L 78,0
+                C 90,2 96,12 98,25
+                L 108,125
+                C 109,138 100,145 88,145
+                L 18,145
+                C 7,145 0,137 2,125
+                L 12,25
+                C 14,11 18,3 28,0
+                Z"
+          RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+
+                        <Path.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="-1.013"
+                                ScaleY="0.997"/>
+                                <SkewTransform AngleY="4.218"
+                               AngleX="6.993"/>
+                                <RotateTransform/>
+                                <TranslateTransform Y="4.226"
+                                    X="-4.424"/>
+                            </TransformGroup>
+                        </Path.RenderTransform>
+
+                    </Path>
+
+                </Canvas>
+
+                <Border
+                Width="127" Canvas.Top="433" 
+                    RenderTransformOrigin="0.5,0.5" 
+                    Opacity="0" 
+                    x:Name="XboxL1Highlightold" 
+                    Canvas.Left="316" 
+                    Height="46" 
+                    CornerRadius="26" 
+                    Background="White" 
+                    HorizontalAlignment="Left" 
+                    VerticalAlignment="Top"
+                    Visibility="Collapsed">
+
+                    <Border.RenderTransform
+
+                >
+
+                        <TransformGroup
+
+                >
+
+                            <ScaleTransform
+
+                ScaleX="1.004" ScaleY="0.994"/>
+
+                            <SkewTransform
+
+                AngleY="-1.316" AngleX="7.635"/>
+
+                            <RotateTransform
+
+                Angle="-0.443"/>
+
+                            <TranslateTransform
+
+                X="2.288" Y="-1.516"/>
+
+                        </TransformGroup>
+
+                    </Border.RenderTransform>
+
+                </Border>
+
+                <Canvas x:Name="XboxL1Highlight"
+        Width="184"
+        Height="65"
+        Canvas.Left="257"
+        Canvas.Top="332"
+        Opacity="0">
+
+                    <!-- L1 SOL PARÇA -->
+                    <Border Width="124"
+            Height="48"
+            Canvas.Left="58"
+            Canvas.Top="102"
+            Background="White"
+            CornerRadius="28" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform AngleY="-2.994"/>
+                                <RotateTransform/>
+                                <TranslateTransform Y="-2.805"/>
+                            </TransformGroup>
+                        </Border.RenderTransform>
+                    </Border>
+
+                    <!-- L1 SAĞ PARÇA -->
+                    <Border Width="68"
+            Height="50"
+            Canvas.Left="125"
+            Canvas.Top="99"
+            Background="White"
+            CornerRadius="31" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform AngleY="-0.722"/>
+                                <RotateTransform/>
+                                <TranslateTransform Y="-0.987"/>
+                            </TransformGroup>
+                        </Border.RenderTransform>
+                    </Border>
+                </Canvas>
+
+                <Canvas x:Name="XboxR1Highlight"
+        Width="184"
+        Height="65"
+        Canvas.Left="1094"
+        Canvas.Top="332"
+        Opacity="0">
+
+                    <!-- Sol taraf - daha büyük -->
+                    <Border Width="62"
+            Height="54"
+            Canvas.Left="-31"
+            Canvas.Top="96"
+            Background="White"
+            CornerRadius="31" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform AngleY="0.261"/>
+                                <RotateTransform/>
+                                <TranslateTransform Y="0.21"/>
+                            </TransformGroup>
+                        </Border.RenderTransform>
+                    </Border>
+
+                    <!-- Sağ taraf - daha küçük -->
+                    <Border Width="115"
+            Height="49"
+            Canvas.Left="-11"
+            Canvas.Top="97"
+            Background="White"
+            CornerRadius="28" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleY="0.999"/>
+                                <SkewTransform AngleY="2.394" AngleX="-0.575"/>
+                                <RotateTransform/>
+                                <TranslateTransform Y="2.399" X="0.243"/>
+                            </TransformGroup>
+                        </Border.RenderTransform>
+                    </Border>
+
+                </Canvas>
+
+                <Ellipse x:Name="XboxL3Highlight"
+                         Width="109"
+                         Height="105"
+                         Canvas.Left="361"
+                         Canvas.Top="681"
+                         Fill="White"
+                         Opacity="0" RenderTransformOrigin="0.498,0.489" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <Ellipse x:Name="XboxR3Highlight"
+                         Width="113"
+                         Height="110"
+                         Canvas.Left="865"
+                         Canvas.Top="867"
+                         Fill="White"
+                         Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <Ellipse x:Name="XboxTriangleHighlight"
+         Width="88"
+         Height="86"
+         Canvas.Left="1042"
+         Canvas.Top="612"
+         Fill="#FFD700"
+         Opacity="0"
+         Panel.ZIndex="1"
+         HorizontalAlignment="Center"
+         VerticalAlignment="Center"/>
+
+                <Ellipse x:Name="XboxCircleHighlight"
+         Width="88"
+         Height="86"
+         Canvas.Left="1127"
+         Canvas.Top="701"
+         Fill="#ED1C24"
+         Opacity="0"
+         Panel.ZIndex="1"
+         HorizontalAlignment="Center"
+         VerticalAlignment="Center"/>
+
+                <Ellipse x:Name="XboxCrossHighlight"
+         Width="89"
+         Height="88"
+         Canvas.Left="1044"
+         Canvas.Top="788"
+         Fill="#00A651"
+         Opacity="0"
+         Panel.ZIndex="1"
+         HorizontalAlignment="Center"
+         VerticalAlignment="Center"/>
+
+                <Ellipse x:Name="XboxSquareHighlight"
+         Width="91"
+         Height="88"
+         Canvas.Left="958"
+         Canvas.Top="701"
+         Fill="#00AEEF"
+         Opacity="0"
+         Panel.ZIndex="1"
+         HorizontalAlignment="Left"
+         VerticalAlignment="Center"/>
+
+                <Path x:Name="XboxDpadUpHighlight"
+      Width="59"
+      Height="81"
+      Canvas.Left="560.547"
+      Canvas.Top="841.334"
+      Fill="White"
+      Opacity="0"
+      Stretch="Fill"
+      Stroke="White"
+      StrokeThickness="6"
+      StrokeLineJoin="Round"
+      Data="M 0,0 L 100,0 L 100,100 L 0,100 Z" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                <Path x:Name="XboxDpadDownHighlight"
+      Width="59"
+      Height="83"
+      Canvas.Left="560.547"
+      Canvas.Top="922.334"
+      Fill="White"
+      Opacity="0"
+      Stretch="Fill"
+      Stroke="White"
+      StrokeThickness="6"
+      StrokeLineJoin="Round"
+      Data="M 0,0 L 100,0 L 100,100 L 0,100 Z" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                <Path x:Name="XboxDpadLeftHighlight"
+      Width="86"
+      Height="52"
+      Canvas.Left="504.833"
+      Canvas.Top="896.357"
+      Fill="White"
+      Opacity="0"
+      Stretch="Fill"
+      Stroke="White"
+      StrokeThickness="6"
+      StrokeLineJoin="Round"
+      Data="M 0,0 L 100,0 L 100,100 L 0,100 Z" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+
+                <Path x:Name="XboxDpadRightHighlight"
+      Width="84"
+      Height="52"
+      Canvas.Left="590"
+      Canvas.Top="896.357"
+      Fill="White"
+      Opacity="0"
+      Stretch="Fill"
+      Stroke="White"
+      StrokeThickness="6"
+      StrokeLineJoin="Round"
+      Data="M 0,0 L 100,0 L 100,100 L 0,100 Z" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+
+                <Border x:Name="XboxShareHighlight"
+                        Width="64"
+                        Height="64"
+                        Canvas.Left="726"
+                        Canvas.Top="774"
+                        Background="White"
+                        CornerRadius="30,30,30,30"
+                        Opacity="0"
+                        Panel.ZIndex="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+                <Border x:Name="XboxOptionsHighlight"
+                        Width="64"
+                        Height="64"
+                        Canvas.Left="825"
+                        Canvas.Top="710"
+                        Background="White"
+                        CornerRadius="30,30,30,30"
+                        Opacity="0"
+                        Panel.ZIndex="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+                <Border x:Name="XboxViewHighlight"
+                        Width="64"
+                        Height="64"
+                        Canvas.Left="625"
+                        Canvas.Top="710"
+                        Background="White"
+                        CornerRadius="30"
+                        Opacity="0"
+                        Panel.ZIndex="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            </Canvas>
+
+            <!-- CONTROLLER FOREGROUND / SYMBOL OVERLAY -->
+
+            <Image x:Name="ControllerSymbolOverlay"
+       Source="pack://application:,,,/assets/controller_tester_base.png"
+       Width="1536"
+       Height="1536"
+       Panel.ZIndex="2"
+       IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+            <Canvas x:Name="LeftStickCanvas"
+                    Canvas.Left="438"
+                    Canvas.Top="1150"
+                    Width="260"
+                    Height="260">
+                <Ellipse Width="260"
+                         Height="260"
+                         Stroke="#777777"
+                         StrokeThickness="4"/>
+                <Line X1="0"
+                      Y1="130"
+                      X2="260"
+                      Y2="130"
+                      Stroke="#777777"
+                      StrokeThickness="2"/>
+                <Line X1="130"
+                      Y1="0"
+                      X2="130"
+                      Y2="260"
+                      Stroke="#777777"
+                      StrokeThickness="2"/>
+
+                <Ellipse x:Name="LeftStickDot"
+                         Width="24"
+                         Height="24"
+                         Fill="White"
+                         Canvas.Left="118"
+                         Canvas.Top="118"/>
+            </Canvas>
+
+            <Canvas x:Name="RightStickCanvas"
+                    Canvas.Left="838"
+                    Canvas.Top="1150"
+                    Width="260"
+                    Height="260">
+                <Ellipse Width="260"
+                         Height="260"
+                         Stroke="#777777"
+                         StrokeThickness="4"/>
+                <Line X1="0"
+                      Y1="130"
+                      X2="260"
+                      Y2="130"
+                      Stroke="#777777"
+                      StrokeThickness="2"/>
+                <Line X1="130"
+                      Y1="0"
+                      X2="130"
+                      Y2="260"
+                      Stroke="#777777"
+                      StrokeThickness="2"/>
+
+                <Ellipse x:Name="RightStickDot"
+                         Width="24"
+                         Height="24"
+                         Fill="White"
+                         Canvas.Left="118"
+                         Canvas.Top="118"/>
+            </Canvas>
+
+        </Canvas>
+    </Viewbox>
+</UserControl>

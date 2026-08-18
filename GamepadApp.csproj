@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+	  <PlatformTarget>x64</PlatformTarget>
+	  <ApplicationIcon>assets\appicon.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Product>aRacnid GamepadApp</Product>
+    <Company>aRacnid</Company>
+    <Authors>Lütfi</Authors>
+    <Description>Physical gamepad input to virtual DualShock 4 or Xbox 360 output.</Description>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+<ItemGroup>
+    <PackageReference Include="HidSharp" Version="2.6.4" />
+    <PackageReference Include="Nefarius.ViGEm.Client" Version="1.21.256" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="assets\controller.png" />
+    <Resource Include="assets\controller_tester_base.png" />
+    <Resource Include="assets\controller_bindings_layout.png" />
+	<Resource Include="assets\appicon.ico" />
+    <Resource Include="assets\controller2.png" />
+    <Resource Include="assets\controller2_tester_base.png" />
+    <Resource Include="assets\controller2_bindings_layout.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\tr.json" />
+    <EmbeddedResource Include="Localization\en.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="THIRD-PARTY-NOTICES.txt"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Update="README.md"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Update="native\SDL3.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          TargetPath="SDL3.dll" />
+    <None Update="native\SDL3-LICENSE.txt"
+          CopyToOutputDirectory="PreserveNewest"
+          TargetPath="SDL3-LICENSE.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+  </ItemGroup>
+
+</Project>

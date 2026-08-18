@@ -1,0 +1,78 @@
+<Window x:Class="GamepadApp.ProfileSelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Profil Seç"
+        Width="1000"
+        Height="650"
+        WindowStartupLocation="CenterScreen"
+        Background="#0D0D0D">
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="SelectTitleText"
+                   Grid.Row="0"
+                   Text="Kim kullanıyor?"
+                   Foreground="White"
+                   FontSize="34"
+                   FontWeight="SemiBold"
+                   HorizontalAlignment="Center"
+                   Margin="0,70,0,40"/>
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+            <WrapPanel x:Name="ProfilesPanel"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Top"
+                       Margin="40">
+
+
+
+                <Button x:Name="NewProfileButton"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        Margin="12"
+                        Click="NewProfileButton_Click">
+
+                    <Border Width="180"
+                            Height="220"
+                            Background="#121212"
+                            BorderBrush="#2A2A2A"
+                            BorderThickness="1"
+                            CornerRadius="14"
+                            Padding="14">
+
+                        <StackPanel VerticalAlignment="Center">
+
+                            <TextBlock Text="+"
+                                       Foreground="#B0B0B0"
+                                       FontSize="64"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBlock x:Name="NewProfileCardText"
+                                       Text="Yeni Profil"
+                                       Foreground="White"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,12,0,0"/>
+
+                        </StackPanel>
+
+                    </Border>
+
+                </Button>
+
+            </WrapPanel>
+        </ScrollViewer>
+
+    </Grid>
+
+</Window>

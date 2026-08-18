@@ -1,0 +1,25 @@
+# Visual Studio / .NET
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.rsuser
+
+# Local build and release output
+artifacts/
+TestResults/
+*.trx
+*.coverage
+
+# OS and sync metadata
+Thumbs.db
+Desktop.ini
+desktop.ini
+.DS_Store
+*.tmp
+
+# Local IDE settings
+.idea/
+.vscode/
+publish/

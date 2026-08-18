@@ -1,0 +1,76 @@
+<Window x:Class="GamepadApp.NewProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Yeni Profil"
+        Width="420"
+        Height="230"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#0D0D0D">
+
+    <Grid Margin="25">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="NewProfileTitleText"
+                   Text="Yeni profil oluştur"
+                   Foreground="White"
+                   FontSize="22"
+                   FontWeight="SemiBold"/>
+
+        <StackPanel Grid.Row="1"
+                    Margin="0,22,0,0">
+
+            <TextBlock x:Name="ProfileNameLabelText"
+                       Text="Profil adı"
+                       Foreground="#A0A0A0"
+                       FontSize="13"
+                       Margin="0,0,0,7"/>
+
+            <TextBox x:Name="ProfileNameTextBox"
+                     FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                     Height="38"
+                     FontSize="15"
+                     Padding="10,6"
+                     Background="#181818"
+                     Foreground="White"
+                     BorderBrush="#333333"
+                     CaretBrush="White"/>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom">
+
+            <Button x:Name="CancelButton"
+                    Content="İptal"
+                    Width="90"
+                    Height="36"
+                    Margin="0,0,8,0"
+                    Background="#181818"
+                    Foreground="White"
+                    BorderBrush="#333333"
+                    IsCancel="True"
+                    Click="CancelButton_Click"/>
+
+            <Button x:Name="CreateButton"
+                    Content="Oluştur"
+                    Width="100"
+                    Height="36"
+                    Background="#292929"
+                    Foreground="White"
+                    BorderBrush="#444444"
+                    IsDefault="True"
+                    Click="CreateButton_Click"/>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>

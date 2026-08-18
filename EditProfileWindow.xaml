@@ -1,0 +1,57 @@
+<Window x:Class="GamepadApp.EditProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Profili Düzenle"
+        Width="360"
+        Height="330"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#0D0D0D">
+
+    <StackPanel Margin="25">
+
+        <TextBlock x:Name="ProfileTitle"
+                   Text="Profil"
+                   Foreground="White"
+                   FontSize="22"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,20"/>
+
+        <Button x:Name="RenameButton"
+                Content="Yeniden adlandır"
+                Height="42"
+                Margin="0,0,0,10"
+                Background="#181818"
+                Foreground="White"
+                BorderBrush="#333333"
+                Click="RenameButton_Click"/>
+
+        <Button x:Name="CopyButton"
+                Content="Kopyala"
+                Height="42"
+                Margin="0,0,0,10"
+                Background="#181818"
+                Foreground="White"
+                BorderBrush="#333333"
+                Click="CopyButton_Click"/>
+
+        <Button x:Name="MakeMainButton"
+                Content="Ana profil yap"
+                Height="42"
+                Margin="0,0,0,10"
+                Background="#181818"
+                Foreground="White"
+                BorderBrush="#333333"
+                Click="MakeMainButton_Click"/>
+
+        <Button x:Name="DeleteButton"
+                Content="Sil"
+                Height="42"
+                Background="#181818"
+                Foreground="White"
+                BorderBrush="#333333"
+                Click="DeleteButton_Click"/>
+
+    </StackPanel>
+
+</Window>
