@@ -466,6 +466,16 @@ The application interface currently supports:
 
 ---
 
+## License
+
+aRacnid GamepadApp is licensed under the **GNU General Public License v3.0 only (GPL-3.0-only)**.
+
+You may use, study, modify, and redistribute the software under the terms of the GPLv3. If you distribute modified versions or derivative works, the corresponding source code must remain available under the same license.
+
+See [LICENSE](LICENSE) for the full license text.
+
+---
+
 ## Status
 
 **aRacnid GamepadApp 1.0.0**
