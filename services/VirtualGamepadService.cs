@@ -311,6 +311,16 @@ namespace GamepadApp.Services
             ds4Controller.SetSliderValue(
                 DualShock4Slider.RightTrigger, state.RightTrigger);
 
+            // DS4 raporu tetiklerin analog değerlerini ve dijital basılı
+            // bitlerini ayrı alanlarda taşır. Bazı oyun bağlamları yalnızca
+            // bu bitleri okuduğundan ikisini aynı final state'ten üret.
+            ds4Controller.SetButtonState(
+                DualShock4Button.TriggerLeft,
+                state.LeftTrigger > 0);
+            ds4Controller.SetButtonState(
+                DualShock4Button.TriggerRight,
+                state.RightTrigger > 0);
+
             ds4Controller.SetAxisValue(
                 DualShock4Axis.LeftThumbX, state.LeftStickX);
             ds4Controller.SetAxisValue(

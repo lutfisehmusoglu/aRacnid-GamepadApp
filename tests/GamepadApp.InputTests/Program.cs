@@ -750,6 +750,12 @@ static void TestSingleSubmitSourceGuard()
     Equal(2, Regex.Matches(source, @"AutoSubmitReport\s*=\s*false").Count);
     Equal(0, Regex.Matches(source, @"AutoSubmitReport\s*=\s*true").Count);
     Equal(2, Regex.Matches(source, @"\.SubmitReport\s*\(\s*\)\s*;").Count);
+    Equal(1, Regex.Matches(
+        source,
+        @"SetButtonState\s*\(\s*DualShock4Button\.TriggerLeft\s*,\s*state\.LeftTrigger\s*>\s*0\s*\)").Count);
+    Equal(1, Regex.Matches(
+        source,
+        @"SetButtonState\s*\(\s*DualShock4Button\.TriggerRight\s*,\s*state\.RightTrigger\s*>\s*0\s*\)").Count);
 }
 
 static void TestSinglePhysicalReaderSourceGuard()
