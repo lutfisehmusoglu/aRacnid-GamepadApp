@@ -900,6 +900,53 @@
 
                             </Border>
 
+                            <!-- === GÜNCELLEMELER === -->
+                            <Grid Margin="0,16,0,10">
+                                <TextBlock x:Name="UpdatesSectionLabel"
+                                           Text="Güncellemeler"
+                                           Foreground="#A0A0A0"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="CheckUpdatesButton"
+                                        Content="Güncellemeleri Kontrol Et"
+                                        HorizontalAlignment="Right"
+                                        Height="30"
+                                        Padding="12,0"
+                                        Foreground="#D0D0D0"
+                                        Background="#1B1B1B"
+                                        BorderBrush="#343434"
+                                        BorderThickness="1"
+                                        FontSize="11"
+                                        FontWeight="SemiBold"
+                                        Cursor="Hand"
+                                        Click="CheckUpdatesButton_Click"/>
+                            </Grid>
+
+                            <Border Background="#151515"
+                                    BorderBrush="#2A2A2A"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="22,18"
+                                    Margin="0,0,0,10">
+
+                                <StackPanel>
+                                    <TextBlock x:Name="UpdatesTitleText"
+                                               Text="Mevcut sürüm"
+                                               Foreground="White"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"/>
+
+                                    <TextBlock x:Name="CurrentVersionText"
+                                               Text="—"
+                                               Foreground="#8F8F8F"
+                                               FontSize="13"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                            </Border>
+
                             <!-- === SİSTEM BİLEŞENLERİ === -->
                             <Grid Margin="0,16,0,10">
                                 <TextBlock x:Name="ComponentsSectionLabel"

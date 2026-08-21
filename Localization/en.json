@@ -84,6 +84,20 @@
   "components.install_not_detected": "The installer finished, but the component does not appear ready yet. Restart Windows and check again from Required Components. A ViGEmBus update may require running the installer a second time.",
   "components.install_error": "Installation could not be completed.\n\n{0}",
 
+  "updates.section": "Updates",
+  "updates.current_version": "Current version",
+  "updates.check": "Check for Updates",
+  "updates.checking": "Checking...",
+  "updates.up_to_date": "aRacnid is up to date.",
+  "updates.error": "Could not check for updates.\n\n{0}",
+  "updates.available_title": "New update available",
+  "updates.available_message": "aRacnid v{0} is available.",
+  "updates.update_now": "Update Now",
+  "updates.later": "Later",
+  "updates.downloading": "Downloading update... {0}%",
+  "updates.applying": "Applying update...",
+  "updates.download_error": "Could not download the update.\n\n{0}",
+
   "tray.show": "Show",
   "tray.exit": "Exit",
 

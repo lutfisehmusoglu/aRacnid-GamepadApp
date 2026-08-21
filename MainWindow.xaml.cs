@@ -132,6 +132,13 @@ public partial class MainWindow : Window
         UpdateLangButtonStyles();
         CreateNotifyIcon();
 
+        CurrentVersionText.Text =
+            UpdateService.Instance.CurrentVersionString;
+
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.ApplicationIdle,
+            new Action(StartSilentUpdateCheck));
+
         RefreshController();
 
         wasControllerConnected =
@@ -353,6 +360,9 @@ public partial class MainWindow : Window
         NotificationsDescText.Text = loc.Get("advanced.notifications_desc");
         LanguageTitleText.Text = loc.Get("advanced.language");
         LanguageDescText.Text = loc.Get("advanced.language_desc");
+        UpdatesSectionLabel.Text = loc.Get("updates.section");
+        UpdatesTitleText.Text = loc.Get("updates.current_version");
+        CheckUpdatesButton.Content = loc.Get("updates.check");
         ComponentsSectionLabel.Text = loc.Get("advanced.components");
         ManageComponentsButton.Content =
             loc.Get("advanced.manage_components");
@@ -1621,6 +1631,87 @@ public partial class MainWindow : Window
     }
 
     // ============================================
+    // GÜNCELLEMELER
+    // ============================================
+
+    private async void StartSilentUpdateCheck()
+    {
+        try
+        {
+            UpdateCheckResult result =
+                await UpdateService.Instance.CheckForUpdatesAsync();
+
+            if (result.Status != UpdateCheckStatus.UpdateAvailable)
+                return;
+
+            if (Dispatcher.HasShutdownStarted)
+                return;
+
+            ShowUpdateAvailableDialog(result);
+        }
+        catch
+        {
+        }
+    }
+
+    private async void CheckUpdatesButton_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        var loc = LocalizationService.Instance;
+
+        CheckUpdatesButton.IsEnabled = false;
+        CheckUpdatesButton.Content = loc.Get("updates.checking");
+
+        try
+        {
+            UpdateCheckResult result =
+                await UpdateService.Instance.CheckForUpdatesAsync();
+
+            switch (result.Status)
+            {
+                case UpdateCheckStatus.UpdateAvailable:
+                    ShowUpdateAvailableDialog(result);
+                    break;
+
+                case UpdateCheckStatus.UpToDate:
+                    MessageBox.Show(
+                        loc.Get("updates.up_to_date"),
+                        loc.Get("app.title"),
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    break;
+
+                default:
+                    MessageBox.Show(
+                        loc.Get(
+                            "updates.error",
+                            result.ErrorMessage ?? ""),
+                        loc.Get("updates.available_title"),
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    break;
+            }
+        }
+        finally
+        {
+            CheckUpdatesButton.IsEnabled = true;
+            CheckUpdatesButton.Content = loc.Get("updates.check");
+        }
+    }
+
+    private void ShowUpdateAvailableDialog(
+        UpdateCheckResult result)
+    {
+        var dialog = new UpdateAvailableWindow(result);
+
+        if (IsVisible)
+            dialog.Owner = this;
+
+        dialog.ShowDialog();
+    }
+
+    // ============================================
     // WM_RESTORE_APP mesaj işleyici
     // ============================================
 
@@ -1689,3 +1780,5 @@ public partial class MainWindow : Window
             Brushes.White;
     }
 }
+
+// Lorem ipsum - v1.0.4 update test marker.

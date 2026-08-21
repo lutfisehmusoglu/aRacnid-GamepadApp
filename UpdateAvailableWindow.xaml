@@ -1,0 +1,85 @@
+<Window x:Class="GamepadApp.UpdateAvailableWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Yeni güncelleme mevcut"
+        Width="460"
+        Height="250"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="#0D0D0D">
+
+    <Grid Margin="25">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="UpdateTitleText"
+                   Text="Yeni güncelleme mevcut"
+                   Foreground="White"
+                   FontSize="22"
+                   FontWeight="SemiBold"/>
+
+        <TextBlock x:Name="UpdateMessageText"
+                   Grid.Row="1"
+                   Text="aRacnid v1.0.4 kullanılabilir."
+                   Foreground="#D0D0D0"
+                   FontSize="15"
+                   Margin="0,16,0,0"
+                   TextWrapping="Wrap"/>
+
+        <StackPanel x:Name="ProgressPanel"
+                    Grid.Row="2"
+                    Margin="0,18,0,0"
+                    Visibility="Collapsed">
+
+            <TextBlock x:Name="DownloadStatusText"
+                       Text=""
+                       Foreground="#A0A0A0"
+                       FontSize="13"
+                       Margin="0,0,0,8"/>
+
+            <ProgressBar x:Name="DownloadProgressBar"
+                         Height="8"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="0"
+                         Foreground="#4A90E2"
+                         Background="#1B1B1B"
+                         BorderThickness="0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom">
+
+            <Button x:Name="LaterButton"
+                    Content="Daha Sonra"
+                    Width="110"
+                    Height="36"
+                    Margin="0,0,8,0"
+                    Background="#181818"
+                    Foreground="White"
+                    BorderBrush="#333333"
+                    IsCancel="True"
+                    Click="LaterButton_Click"/>
+
+            <Button x:Name="UpdateNowButton"
+                    Content="Şimdi Güncelle"
+                    Width="120"
+                    Height="36"
+                    Background="#292929"
+                    Foreground="White"
+                    BorderBrush="#444444"
+                    IsDefault="True"
+                    Click="UpdateNowButton_Click"/>
+        </StackPanel>
+
+    </Grid>
+
+</Window>

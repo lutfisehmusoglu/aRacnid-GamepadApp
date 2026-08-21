@@ -84,6 +84,20 @@
   "components.install_not_detected": "Kurucu tamamlandı ancak bileşen henüz kullanıma hazır görünmüyor. Bilgisayarı yeniden başlatın ve Gerekli Bileşenler ekranından tekrar denetleyin. ViGEmBus güncellemesinde kurucuyu ikinci kez çalıştırmak gerekebilir.",
   "components.install_error": "Kurulum tamamlanamadı.\n\n{0}",
 
+  "updates.section": "Güncellemeler",
+  "updates.current_version": "Mevcut sürüm",
+  "updates.check": "Güncellemeleri Kontrol Et",
+  "updates.checking": "Denetleniyor...",
+  "updates.up_to_date": "aRacnid güncel.",
+  "updates.error": "Güncelleme denetlenemedi.\n\n{0}",
+  "updates.available_title": "Yeni güncelleme mevcut",
+  "updates.available_message": "aRacnid v{0} kullanılabilir.",
+  "updates.update_now": "Şimdi Güncelle",
+  "updates.later": "Daha Sonra",
+  "updates.downloading": "Güncelleme indiriliyor... %{0}",
+  "updates.applying": "Güncelleme uygulanıyor...",
+  "updates.download_error": "Güncelleme indirilemedi.\n\n{0}",
+
   "tray.show": "Göster",
   "tray.exit": "Çıkış",
 
