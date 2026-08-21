@@ -9,6 +9,65 @@
         ShowInTaskbar="False"
         Background="#0D0D0D">
 
+    <Window.Resources>
+
+        <Style x:Key="UpdateDialogButtonStyle"
+               TargetType="Button">
+            <Setter Property="Foreground"
+                    Value="White"/>
+            <Setter Property="FontSize"
+                    Value="13"/>
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter x:Name="content"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="border"
+                                        Property="BorderBrush"
+                                        Value="#3E3E3E"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#2E2E2E"/>
+                            </Trigger>
+                            <!-- Disabled: yazı okunaklı kalsın; soluklaşmayı
+                                 arka plan / kenarlık tonuna taşı. -->
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="content"
+                                        Property="TextElement.Foreground"
+                                        Value="#B8B8B8"/>
+                                <Setter TargetName="border"
+                                        Property="Background"
+                                        Value="#121212"/>
+                                <Setter TargetName="border"
+                                        Property="BorderBrush"
+                                        Value="#262626"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
     <Grid Margin="25">
 
         <Grid.RowDefinitions>
@@ -66,6 +125,7 @@
                     Background="#181818"
                     Foreground="White"
                     BorderBrush="#333333"
+                    Style="{StaticResource UpdateDialogButtonStyle}"
                     IsCancel="True"
                     Click="LaterButton_Click"/>
 
@@ -76,6 +136,7 @@
                     Background="#292929"
                     Foreground="White"
                     BorderBrush="#444444"
+                    Style="{StaticResource UpdateDialogButtonStyle}"
                     IsDefault="True"
                     Click="UpdateNowButton_Click"/>
         </StackPanel>
