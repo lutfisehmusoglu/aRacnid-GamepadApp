@@ -1795,5 +1795,3 @@ public partial class MainWindow : Window
             Brushes.White;
     }
 }
-
-// Lorem ipsum dolor sit amet, consectetur adipiscing elit.
