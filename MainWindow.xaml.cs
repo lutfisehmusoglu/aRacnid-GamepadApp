@@ -29,6 +29,21 @@ public partial class MainWindow : Window
 
     public Profile ActiveProfile => activeProfile;
 
+    public Color? ActiveLightbarColor
+    {
+        get
+        {
+            if (!lightbarEnabled ||
+                selectedColorSlotIndex < 0 ||
+                selectedColorSlotIndex >= colorSlots.Count)
+            {
+                return null;
+            }
+
+            return colorSlots[selectedColorSlotIndex];
+        }
+    }
+
     private readonly DispatcherTimer deviceTimer;
 
     private string? lastPhysicalDeviceId;

@@ -10,6 +10,7 @@ public class GamepadEmulationService
     private readonly ButtonRemapService buttonRemapService;
     private readonly Profile activeProfile;
     private readonly PhysicalGamepadManager physicalGamepadManager = new();
+    private readonly MouseInputService mouseInputService = new();
     private readonly DispatcherTimer timer;
     private readonly object feedbackSync = new();
 
@@ -24,6 +25,10 @@ public class GamepadEmulationService
 
     public PhysicalGamepadDescriptor? CurrentDescriptor =>
         physicalGamepadManager.CurrentDescriptor;
+
+    public TouchpadMode TouchpadMode =>
+        activeProfile.ControllerSettings?.TouchpadMode ??
+        TouchpadMode.Normal;
 
     public GamepadEmulationService(
         GamepadService gamepadService,
@@ -90,6 +95,7 @@ public class GamepadEmulationService
         // ReadNext içindeki flush yolundan native cihaza gönderilir.
         virtualGamepadService.ResetState();
         virtualGamepadService.Disconnect();
+        mouseInputService.Reset();
         physicalGamepadManager.TrySetVibration(0, 0, 0);
         physicalGamepadManager.WaitForPendingOutput(1200);
 
@@ -150,6 +156,7 @@ public class GamepadEmulationService
                 case PhysicalReadResult.Disconnected:
                     latestState = null;
                     sourceConnected = false;
+                    mouseInputService.Reset();
                     virtualGamepadService.DisconnectVirtualController();
                     physicalGamepadManager.TrySetVibration(0, 0, 0);
                     break;
@@ -179,12 +186,26 @@ public class GamepadEmulationService
         virtualGamepadService.SwitchMode(
             GamepadService.SelectedVirtualType);
 
-        GamepadOutputState output = BuildOutputState(input);
+        TouchpadMode mode = TouchpadMode;
+
+        GamepadOutputState output = BuildOutputState(input, mode);
         virtualGamepadService.ApplyState(output);
+
+        if (mode == TouchpadMode.Mouse)
+            mouseInputService.ProcessTouch(input);
+        else
+            mouseInputService.Reset();
     }
 
-    internal GamepadOutputState BuildOutputState(
+    public GamepadOutputState BuildOutputState(
         PhysicalGamepadState input)
+    {
+        return BuildOutputState(input, TouchpadMode);
+    }
+
+    private GamepadOutputState BuildOutputState(
+        PhysicalGamepadState input,
+        TouchpadMode touchpadMode)
     {
         var output = new GamepadOutputState();
 
@@ -192,7 +213,25 @@ public class GamepadEmulationService
         ProcessButtons(input, output);
         ProcessTriggers(input, output);
         output.PsPressed = input.PsPressed;
-        output.TouchpadPressed = input.TouchpadPressed;
+
+        // Touchpad click yalnız Normal modda sanal DS4 touchpad button'ına
+        // taşınır. Mouse modunda click sol fare tıkına dönüşür; Kapalı modda
+        // tamamen yok sayılır.
+        output.TouchpadPressed =
+            touchpadMode == TouchpadMode.Normal &&
+            input.TouchpadPressed;
+
+        if (touchpadMode == TouchpadMode.Normal)
+        {
+            output.Touch1Active = input.Touch1Active;
+            output.Touch1X = input.Touch1X;
+            output.Touch1Y = input.Touch1Y;
+            output.Touch1TrackingId = input.Touch1TrackingId;
+            output.Touch2Active = input.Touch2Active;
+            output.Touch2X = input.Touch2X;
+            output.Touch2Y = input.Touch2Y;
+            output.Touch2TrackingId = input.Touch2TrackingId;
+        }
 
         return output;
     }

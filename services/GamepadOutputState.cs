@@ -11,6 +11,14 @@ public class GamepadOutputState
     public byte RightStickY { get; set; } = 128;
     public bool PsPressed { get; set; }
     public bool TouchpadPressed { get; set; }
+    public bool Touch1Active { get; set; }
+    public int Touch1X { get; set; }
+    public int Touch1Y { get; set; }
+    public int Touch1TrackingId { get; set; }
+    public bool Touch2Active { get; set; }
+    public int Touch2X { get; set; }
+    public int Touch2Y { get; set; }
+    public int Touch2TrackingId { get; set; }
 
     public void Reset()
     {
@@ -23,5 +31,13 @@ public class GamepadOutputState
         RightStickY = 128;
         PsPressed = false;
         TouchpadPressed = false;
+        Touch1Active = false;
+        Touch1X = 0;
+        Touch1Y = 0;
+        Touch1TrackingId = 0;
+        Touch2Active = false;
+        Touch2X = 0;
+        Touch2Y = 0;
+        Touch2TrackingId = 0;
     }
 }

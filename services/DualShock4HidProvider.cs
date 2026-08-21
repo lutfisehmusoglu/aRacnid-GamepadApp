@@ -57,6 +57,9 @@ internal sealed class DualShock4HidProvider : IPhysicalGamepadProvider
 
     private sealed class DualShock4HidSession : IPhysicalGamepadSession
     {
+        private const byte Ds4FeatureReportCalibrationId = 0x02;
+        private const int Ds4FeatureReportCalibrationLength = 37;
+
         private readonly HidStream stream;
         private readonly byte[] readBuffer;
         private readonly bool bluetooth;
@@ -71,6 +74,7 @@ internal sealed class DualShock4HidProvider : IPhysicalGamepadProvider
         private long lastTickleTicks;
         private long rumbleStopDeadlineTicks;
         private PhysicalGamepadState? primedState;
+        private bool enhancedReportDetected;
         private volatile bool disposed;
 
         public DualShock4HidSession(HidDevice device)
@@ -104,12 +108,46 @@ internal sealed class DualShock4HidProvider : IPhysicalGamepadProvider
 
             if (bluetooth)
             {
+                // Feature Report 0x02 (kalibrasyon) isteği DS4 firmware'ini
+                // Bluetooth tarafında tam 0x11 input report moduna geçirir.
+                // Best-effort: başarısız olursa minimal 0x01 akışı devam eder.
+                TryEnableBluetoothEnhancedReports(
+                    device.GetMaxFeatureReportLength());
+
                 // DS4 Bluetooth başlangıçta yalnız 10 baytlık minimal 0x01
                 // raporu gönderebilir. Hiçbir efekt alanını geçerli saymayan
-                // bu no-op paket, fiziksel LED/rumble'ı değiştirmeden tam
-                // 0x11..0x19 input raporlarını etkinleştirir.
+                // bu no-op paket, fiziksel LED/rumble'ı değiştirmeden bağlantıyı
+                // canlı tutar.
                 stream.Write(
                     Ds4OutputReportBuilder.BuildBluetooth(default));
+            }
+        }
+
+        private void TryEnableBluetoothEnhancedReports(
+            int featureReportLength)
+        {
+            Debug.WriteLine(
+                "DS4 Bluetooth: requesting feature report 0x02");
+
+            try
+            {
+                int length = Math.Max(
+                    featureReportLength,
+                    Ds4FeatureReportCalibrationLength);
+
+                byte[] buffer = new byte[length];
+                buffer[0] = Ds4FeatureReportCalibrationId;
+
+                stream.GetFeature(buffer, 0, buffer.Length);
+
+                Debug.WriteLine(
+                    "DS4 Bluetooth: enhanced report request succeeded");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(
+                    "DS4 Bluetooth: enhanced report request failed: " +
+                    ex.Message);
             }
         }
 
@@ -200,6 +238,14 @@ internal sealed class DualShock4HidProvider : IPhysicalGamepadProvider
                         out PhysicalGamepadState parsed))
                 {
                     return HandleInputSilence();
+                }
+
+                if (bluetooth && !enhancedReportDetected &&
+                    report[0] == 0x11)
+                {
+                    enhancedReportDetected = true;
+                    Debug.WriteLine(
+                        "DS4 Bluetooth: enhanced input report 0x11 detected");
                 }
 
                 lastValidFrameTicks = Stopwatch.GetTimestamp();

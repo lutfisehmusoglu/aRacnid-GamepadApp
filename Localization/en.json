@@ -127,6 +127,10 @@
 
   "controls.keybindings_btn": "Key Bindings",
   "controls.keybindings_window_title": "aRacnid - Key Bindings",
+  "controls.touchpad_mode": "Touchpad Mode",
+  "controls.touchpad_normal": "Normal",
+  "controls.touchpad_mouse": "Mouse",
+  "controls.touchpad_disabled": "Disabled",
   "controls.gamepad_info": "Gamepad Info",
   "controls.status": "Status:",
   "controls.not_connected": "Not connected",

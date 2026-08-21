@@ -12,10 +12,27 @@
 
             <Image x:Name="BaseControllerImage"
                    Source="pack://application:,,,/assets/controller_tester_base.png"
-                   Width="1536"
-                   Height="1536"
+                   Width="1920"
+                   Height="1920"
+                   Canvas.Left="-192"
+                   Canvas.Top="-192"
                    Panel.ZIndex="0"
-                   IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                   IsHitTestVisible="False" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Center"/>
+
+            <!-- DS4 + Xbox highlight katmanlarini controller ile ayni oranda (%25) buyut -->
+            <Canvas x:Name="ScaledHighlightRoot"
+                    Width="1536"
+                    Height="1536"
+                    Panel.ZIndex="1"
+                    IsHitTestVisible="False">
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1.25" ScaleY="1.25"/>
+                        <TranslateTransform X="-192" Y="-192"/>
+                    </TransformGroup>
+                </Canvas.RenderTransform>
 
             <Canvas x:Name="Ds4HighlightLayer"
         Panel.ZIndex="1">
@@ -195,15 +212,31 @@
          Opacity="0"
          Panel.ZIndex="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
-                <Border x:Name="TouchpadHighlight"
-        Width="446"
-        Height="251"
-        Canvas.Left="544"
-        Canvas.Top="465"
-        Background="#55FFFFFF"
-        CornerRadius="30"
-        Opacity="0"
-        Panel.ZIndex="1"/>
+                <Grid x:Name="TouchpadSurface"
+                      Width="446"
+                      Height="251"
+                      Canvas.Left="544"
+                      Canvas.Top="465"
+                      Panel.ZIndex="1">
+
+                    <!-- Katman 1: Fiziksel touchpad click highlight -->
+                    <Border x:Name="TouchpadHighlight"
+                            Background="#55FFFFFF"
+                            CornerRadius="30"
+                            Opacity="0"/>
+
+                    <!-- Katman 2: Touch trail cizim yuzeyi -->
+                    <Canvas x:Name="TouchTrailCanvas"
+                            ClipToBounds="True"
+                            IsHitTestVisible="False">
+                        <Canvas.Clip>
+                            <RectangleGeometry Rect="0,0,446,251"
+                                               RadiusX="30"
+                                               RadiusY="30"/>
+                        </Canvas.Clip>
+                    </Canvas>
+
+                </Grid>
 
             </Canvas>
 
@@ -615,73 +648,77 @@
 
             </Canvas>
 
+            </Canvas> <!-- ScaledHighlightRoot -->
+
             <!-- CONTROLLER FOREGROUND / SYMBOL OVERLAY -->
 
             <Image x:Name="ControllerSymbolOverlay"
        Source="pack://application:,,,/assets/controller_tester_base.png"
-       Width="1536"
-       Height="1536"
+       Width="1920"
+Height="1920"
+Canvas.Left="-192"
+Canvas.Top="-192"
        Panel.ZIndex="2"
        IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
             <Canvas x:Name="LeftStickCanvas"
-                    Canvas.Left="438"
-                    Canvas.Top="1150"
-                    Width="260"
-                    Height="260">
-                <Ellipse Width="260"
-                         Height="260"
+                    Canvas.Left="355.5"
+                    Canvas.Top="1245.5"
+                    Width="325"
+                    Height="325">
+                <Ellipse Width="325"
+                         Height="325"
                          Stroke="#777777"
-                         StrokeThickness="4"/>
+                         StrokeThickness="5"/>
                 <Line X1="0"
-                      Y1="130"
-                      X2="260"
-                      Y2="130"
+                      Y1="162.5"
+                      X2="325"
+                      Y2="162.5"
                       Stroke="#777777"
-                      StrokeThickness="2"/>
-                <Line X1="130"
+                      StrokeThickness="2.5"/>
+                <Line X1="162.5"
                       Y1="0"
-                      X2="130"
-                      Y2="260"
+                      X2="162.5"
+                      Y2="325"
                       Stroke="#777777"
-                      StrokeThickness="2"/>
+                      StrokeThickness="2.5"/>
 
                 <Ellipse x:Name="LeftStickDot"
-                         Width="24"
-                         Height="24"
+                         Width="30"
+                         Height="30"
                          Fill="White"
-                         Canvas.Left="118"
-                         Canvas.Top="118"/>
+                         Canvas.Left="147.5"
+                         Canvas.Top="147.5"/>
             </Canvas>
 
             <Canvas x:Name="RightStickCanvas"
-                    Canvas.Left="838"
-                    Canvas.Top="1150"
-                    Width="260"
-                    Height="260">
-                <Ellipse Width="260"
-                         Height="260"
+                    Canvas.Left="855.5"
+                    Canvas.Top="1245.5"
+                    Width="325"
+                    Height="325">
+                <Ellipse Width="325"
+                         Height="325"
                          Stroke="#777777"
-                         StrokeThickness="4"/>
+                         StrokeThickness="5"/>
                 <Line X1="0"
-                      Y1="130"
-                      X2="260"
-                      Y2="130"
+                      Y1="162.5"
+                      X2="325"
+                      Y2="162.5"
                       Stroke="#777777"
-                      StrokeThickness="2"/>
-                <Line X1="130"
+                      StrokeThickness="2.5"/>
+                <Line X1="162.5"
                       Y1="0"
-                      X2="130"
-                      Y2="260"
+                      X2="162.5"
+                      Y2="325"
                       Stroke="#777777"
-                      StrokeThickness="2"/>
+                      StrokeThickness="2.5"/>
 
                 <Ellipse x:Name="RightStickDot"
-                         Width="24"
-                         Height="24"
+                         Width="30"
+                         Height="30"
                          Fill="White"
-                         Canvas.Left="118"
-                         Canvas.Top="118"/>
+                         Canvas.Left="147.5"
+                         Canvas.Top="147.5"/>
             </Canvas>
 
         </Canvas>

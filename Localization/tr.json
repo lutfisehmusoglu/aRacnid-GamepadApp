@@ -127,6 +127,10 @@
 
   "controls.keybindings_btn": "Tuş Atamaları",
   "controls.keybindings_window_title": "aRacnid - Tuş Atamaları",
+  "controls.touchpad_mode": "Touchpad Modu",
+  "controls.touchpad_normal": "Normal",
+  "controls.touchpad_mouse": "Mouse",
+  "controls.touchpad_disabled": "Kapalı",
   "controls.gamepad_info": "Gamepad Bilgileri",
   "controls.status": "Durum:",
   "controls.not_connected": "Bağlı değil",

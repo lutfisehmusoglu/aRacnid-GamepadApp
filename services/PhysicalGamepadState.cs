@@ -21,6 +21,16 @@ public class PhysicalGamepadState
     public bool PsPressed { get; set; }
     public bool TouchpadPressed { get; set; }
 
+    public bool Touch1Active { get; set; }
+    public int Touch1X { get; set; }
+    public int Touch1Y { get; set; }
+    public int Touch1TrackingId { get; set; }
+
+    public bool Touch2Active { get; set; }
+    public int Touch2X { get; set; }
+    public int Touch2Y { get; set; }
+    public int Touch2TrackingId { get; set; }
+
     public int? BatteryPercentage { get; set; }
 
     public PhysicalGamepadState Clone()
@@ -43,6 +53,14 @@ public class PhysicalGamepadState
         RightTrigger = other.RightTrigger;
         PsPressed = other.PsPressed;
         TouchpadPressed = other.TouchpadPressed;
+        Touch1Active = other.Touch1Active;
+        Touch1X = other.Touch1X;
+        Touch1Y = other.Touch1Y;
+        Touch1TrackingId = other.Touch1TrackingId;
+        Touch2Active = other.Touch2Active;
+        Touch2X = other.Touch2X;
+        Touch2Y = other.Touch2Y;
+        Touch2TrackingId = other.Touch2TrackingId;
         BatteryPercentage = other.BatteryPercentage;
 
         Buttons.Clear();
@@ -63,6 +81,14 @@ public class PhysicalGamepadState
         Buttons.Clear();
         PsPressed = false;
         TouchpadPressed = false;
+        Touch1Active = false;
+        Touch1X = 0;
+        Touch1Y = 0;
+        Touch1TrackingId = 0;
+        Touch2Active = false;
+        Touch2X = 0;
+        Touch2Y = 0;
+        Touch2TrackingId = 0;
         BatteryPercentage = null;
     }
 }

@@ -10,6 +10,34 @@ public enum Ds4InputTransport
 
 public static class Ds4ReportParser
 {
+    // DS4 touchpad verisi ortak payload'ın sonunda yer alır. USB (64 bayt,
+    // 0x01) ve Bluetooth enhanced (78 bayt, 0x11) raporlarında payload
+    // başlangıç ofseti farklıdır; aşağıdaki sabitler bu ortak payload'ın
+    // sonuna göredir ve parser'ın hesapladığı 'offset' üzerine eklenir.
+    // Kaynak yapı (Linux hid-playstation.c): num_touch_reports,
+    // ardından her biri 9 bayt (timestamp + 2 x 4 bayt touch point) olan
+    // touch_report kayıtları. Her touch point: contact (bit7 active-low),
+    // x_lo, [x_hi:4 | y_lo:4], y_hi. X = (x_hi << 8) | x_lo (0-1919),
+    // Y = (y_hi << 4) | y_lo (0-942).
+    private const int TouchReportCountOffset = 33;
+    private const int TouchReportBaseOffset = 34;
+    private const int TouchReportStride = 9;
+    private const int TouchPoint1Offset = 1;
+    private const int TouchPoint2Offset = 5;
+    private const byte TouchContactInactiveMask = 0x80;
+    private const byte TouchContactIdMask = 0x7F;
+    private const int TouchXHighMask = 0x0F;
+    private const int TouchYLowShift = 4;
+    private const int DebugTouchMoveThreshold = 8;
+
+    private static bool lastDebugTouchActive;
+    private static int lastDebugTouchX = -1;
+    private static int lastDebugTouchY = -1;
+
+    private static bool lastDebugTouch2Active;
+    private static int lastDebugTouch2X = -1;
+    private static int lastDebugTouch2Y = -1;
+
     public static bool TryParse(
         ReadOnlySpan<byte> report,
         Ds4InputTransport transport,
@@ -20,6 +48,7 @@ public static class Ds4ReportParser
 
         int offset;
         bool hasBattery;
+        bool hasTouch;
 
         if (transport == Ds4InputTransport.Usb &&
             report.Length >= 64 &&
@@ -27,6 +56,7 @@ public static class Ds4ReportParser
         {
             offset = 0;
             hasBattery = true;
+            hasTouch = true;
         }
         else if (transport == Ds4InputTransport.Bluetooth &&
                  report.Length >= 78 &&
@@ -45,6 +75,7 @@ public static class Ds4ReportParser
             // üzerinden çalışır.
             offset = 2;
             hasBattery = true;
+            hasTouch = true;
         }
         else if (transport == Ds4InputTransport.Bluetooth &&
                  report.Length >= 10 &&
@@ -54,9 +85,10 @@ public static class Ds4ReportParser
             // geçmeden 10 baytlık minimal 0x01 input üretebilir. Windows HID
             // bu raporu cihazın 547 baytlık maksimum rapor uzunluğuna sıfırla
             // doldurabilir. Kontrol alanları USB ile aynı başlangıçtadır;
-            // minimal framing pil alanını içermez.
+            // minimal framing pil ve touchpad alanlarını içermez.
             offset = 0;
             hasBattery = false;
+            hasTouch = false;
         }
         else
         {
@@ -114,7 +146,154 @@ public static class Ds4ReportParser
             };
         }
 
+        if (hasTouch)
+            ParseTouch(report, offset, state);
+
         return true;
+    }
+
+    private static void ParseTouch(
+        ReadOnlySpan<byte> report,
+        int offset,
+        PhysicalGamepadState state)
+    {
+        int countOffset = offset + TouchReportCountOffset;
+
+        if (report.Length <= countOffset)
+            return;
+
+        int numTouchReports = report[countOffset];
+
+        if (numTouchReports == 0)
+            return;
+
+        // En güncel touch_report kaydı: [0]=timestamp, [1..4]=contact 1,
+        // [5..8]=contact 2. İki contact da aynı kayıttan okunur.
+        int recordOffset =
+            offset +
+            TouchReportBaseOffset +
+            (numTouchReports - 1) * TouchReportStride;
+
+        ParseTouchPoint(
+            report,
+            recordOffset + TouchPoint1Offset,
+            state,
+            isFirst: true);
+        ParseTouchPoint(
+            report,
+            recordOffset + TouchPoint2Offset,
+            state,
+            isFirst: false);
+    }
+
+    private static void ParseTouchPoint(
+        ReadOnlySpan<byte> report,
+        int contactOffset,
+        PhysicalGamepadState state,
+        bool isFirst)
+    {
+        if (report.Length <= contactOffset + 3)
+            return;
+
+        byte contact = report[contactOffset];
+        byte xLow = report[contactOffset + 1];
+        byte xyHigh = report[contactOffset + 2];
+        byte yHigh = report[contactOffset + 3];
+
+        int trackingId = contact & TouchContactIdMask;
+
+        if ((contact & TouchContactInactiveMask) != 0)
+        {
+            if (isFirst)
+                DebugLogTouch1Released(trackingId);
+            else
+                DebugLogTouch2Released(trackingId);
+            return;
+        }
+
+        int x = ((xyHigh & TouchXHighMask) << 8) | xLow;
+        int y = (yHigh << TouchYLowShift) | (xyHigh >> TouchYLowShift);
+
+        if (isFirst)
+        {
+            state.Touch1Active = true;
+            state.Touch1X = x;
+            state.Touch1Y = y;
+            state.Touch1TrackingId = trackingId;
+            DebugLogTouch1Moved(x, y, trackingId);
+        }
+        else
+        {
+            state.Touch2Active = true;
+            state.Touch2X = x;
+            state.Touch2Y = y;
+            state.Touch2TrackingId = trackingId;
+            DebugLogTouch2Moved(x, y, trackingId);
+        }
+    }
+
+    private static void DebugLogTouch1Released(int trackingId)
+    {
+        if (!lastDebugTouchActive)
+            return;
+
+        lastDebugTouchActive = false;
+
+        Debug.WriteLine(
+            $"DS4 Touch1: Active=False " +
+            $"X={lastDebugTouchX} Y={lastDebugTouchY} Id={trackingId}");
+    }
+
+    private static void DebugLogTouch1Moved(
+        int x,
+        int y,
+        int trackingId)
+    {
+        bool movedMeaningfully =
+            Math.Abs(x - lastDebugTouchX) >= DebugTouchMoveThreshold ||
+            Math.Abs(y - lastDebugTouchY) >= DebugTouchMoveThreshold;
+
+        if (lastDebugTouchActive && !movedMeaningfully)
+            return;
+
+        lastDebugTouchActive = true;
+        lastDebugTouchX = x;
+        lastDebugTouchY = y;
+
+        Debug.WriteLine(
+            $"DS4 Touch1: Active=True X={x} Y={y} Id={trackingId}");
+    }
+
+    private static void DebugLogTouch2Released(int trackingId)
+    {
+        if (!lastDebugTouch2Active)
+            return;
+
+        lastDebugTouch2Active = false;
+
+        Debug.WriteLine(
+            $"DS4 Touch2: Active=False " +
+            $"X={lastDebugTouch2X} Y={lastDebugTouch2Y} Id={trackingId}");
+    }
+
+    private static void DebugLogTouch2Moved(
+        int x,
+        int y,
+        int trackingId)
+    {
+        bool movedMeaningfully =
+            Math.Abs(x - lastDebugTouch2X) >= DebugTouchMoveThreshold ||
+            Math.Abs(y - lastDebugTouch2Y) >= DebugTouchMoveThreshold;
+
+        if (lastDebugTouch2Active && !movedMeaningfully)
+            return;
+
+        lastDebugTouch2Active = true;
+        lastDebugTouch2X = x;
+        lastDebugTouch2Y = y;
+
+        Debug.WriteLine(
+            $"DS4 Touch2: Active=True X={x} Y={y} Id={trackingId}");
     }
 
     public static bool IsWirelessAdapterDisconnected(

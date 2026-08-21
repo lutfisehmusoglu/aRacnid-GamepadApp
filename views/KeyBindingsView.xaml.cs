@@ -78,6 +78,14 @@ namespace GamepadApp.Views
                 StringComparison.OrdinalIgnoreCase);
             GamepadComboBox.SelectedIndex = isXboxMode ? 1 : 0;
 
+            TouchpadModeComboBox.SelectedIndex =
+                draftSettings.TouchpadMode switch
+                {
+                    TouchpadMode.Mouse => 1,
+                    TouchpadMode.Disabled => 2,
+                    _ => 0
+                };
+
             ActiveProfileNameText.Text = profile.Name;
             GamepadProfileText.Text = profile.Name;
             LoadAllBindingButtons(draftSettings);
@@ -811,6 +819,7 @@ namespace GamepadApp.Views
             SensitivitySlider.Value = draftSettings.Sensitivity;
             LeftMotorSlider.Value = draftSettings.LeftMotorStrength;
             RightMotorSlider.Value = draftSettings.RightMotorStrength;
+            TouchpadModeComboBox.SelectedIndex = 0;
 
             ResetAllBindingButtons();
 
@@ -950,6 +959,31 @@ namespace GamepadApp.Views
             }
         }
 
+        private void TouchpadModeComboBox_SelectionChanged(
+            object sender,
+            SelectionChangedEventArgs e)
+        {
+            if (isLoadingCombo)
+                return;
+
+            if (TouchpadModeComboBox.SelectedItem is ComboBoxItem item &&
+                item.Tag is string tag)
+            {
+                draftSettings.TouchpadMode = ParseTouchpadMode(tag);
+                SetDirty(true);
+            }
+        }
+
+        private static TouchpadMode ParseTouchpadMode(string? tag)
+        {
+            return tag switch
+            {
+                "Mouse" => TouchpadMode.Mouse,
+                "Disabled" => TouchpadMode.Disabled,
+                _ => TouchpadMode.Normal
+            };
+        }
+
         private void SetDirty(bool isDirty)
         {
             hasUnsavedChanges = isDirty;
@@ -1033,7 +1067,12 @@ namespace GamepadApp.Views
 
             GamepadSectionTitle.Text = loc.Get("nav.gamepad");
             DeviceSectionTitle.Text = loc.Get("controls.device_label");
+            TouchpadModeSectionTitle.Text = loc.Get("controls.touchpad_mode");
             ActiveProfileSectionTitle.Text = loc.Get("controls.active_profile");
+
+            TouchpadNormalItem.Content = loc.Get("controls.touchpad_normal");
+            TouchpadMouseItem.Content = loc.Get("controls.touchpad_mouse");
+            TouchpadDisabledItem.Content = loc.Get("controls.touchpad_disabled");
 
             DpadSectionTitle.Text = loc.Get("controls.dpad");
             DpadUpLabel.Text = loc.Get("controls.up");

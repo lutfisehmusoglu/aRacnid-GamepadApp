@@ -1,5 +1,12 @@
 namespace GamepadApp.Models;
 
+public enum TouchpadMode
+{
+    Normal,
+    Mouse,
+    Disabled
+}
+
 public class ControllerProfileSettings
 {
     public double Deadzone { get; set; } = 10;
@@ -8,6 +15,7 @@ public class ControllerProfileSettings
     public double LeftMotorStrength { get; set; } = 100;
     public double RightMotorStrength { get; set; } = 100;
     public string OutputGamepadType { get; set; } = "DualShock4";
+    public TouchpadMode TouchpadMode { get; set; } = TouchpadMode.Normal;
     public Dictionary<string, string> ButtonMappings { get; set; } = new();
 
     public ControllerProfileSettings Clone()
@@ -20,6 +28,7 @@ public class ControllerProfileSettings
             LeftMotorStrength = LeftMotorStrength,
             RightMotorStrength = RightMotorStrength,
             OutputGamepadType = OutputGamepadType,
+            TouchpadMode = TouchpadMode,
             ButtonMappings = new Dictionary<string, string>(
                 ButtonMappings ?? new Dictionary<string, string>())
         };

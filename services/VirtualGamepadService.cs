@@ -7,6 +7,12 @@ namespace GamepadApp.Services
 {
     public class VirtualGamepadService
     {
+        private const int Ds4ReportExLength = 63;
+        private const int Ds4TouchMaxX = 1919;
+        private const int Ds4TouchMaxY = 942;
+        private const byte Ds4TouchContactInactive = 0x80;
+        private const byte Ds4BatteryFull = 0x0B;
+
         private readonly object sync = new();
         private ViGEmClient? client;
         private IXbox360Controller? xboxController;
@@ -17,6 +23,18 @@ namespace GamepadApp.Services
             VirtualControllerType.DualShock4;
         private bool isDisconnected;
         private bool disposed;
+
+        private bool ds4Touch1WasActive;
+        private int ds4Touch1LastX;
+        private int ds4Touch1LastY;
+        private int ds4Touch1LastTrackingId;
+
+        private bool ds4Touch2WasActive;
+        private int ds4Touch2LastX;
+        private int ds4Touch2LastY;
+        private int ds4Touch2LastTrackingId;
+
+        private byte ds4TouchPacketCounter;
 
         public event Action<byte, byte>? FeedbackReceived;
 
@@ -97,6 +115,8 @@ namespace GamepadApp.Services
 
         private void DisconnectCurrent(bool resetState = true)
         {
+            ResetDs4TouchState();
+
             if (resetState)
             {
                 try
@@ -288,50 +308,222 @@ namespace GamepadApp.Services
         {
             if (ds4Controller == null) return;
 
-            ds4Controller.ResetReport();
+            byte[] report = BuildDs4ReportEx(state);
 
-            foreach (var btnEntry in DS4ButtonMap)
+            ds4Controller.SubmitRawReport(report);
+        }
+
+        public byte[] BuildDs4ReportEx(GamepadOutputState state)
+        {
+            byte[] report = new byte[Ds4ReportExLength];
+
+            report[0] = state.LeftStickX;
+            report[1] = state.LeftStickY;
+            report[2] = state.RightStickX;
+            report[3] = state.RightStickY;
+
+            ushort buttons = ComputeDS4Dpad(state.Buttons).Value;
+
+            foreach (KeyValuePair<string, DualShock4Button> entry in DS4ButtonMap)
             {
-                bool pressed = state.Buttons.Contains(btnEntry.Key);
-                ds4Controller.SetButtonState(btnEntry.Value, pressed);
+                if (state.Buttons.Contains(entry.Key))
+                    buttons |= entry.Value.Value;
             }
-
-            ds4Controller.SetButtonState(
-                DualShock4SpecialButton.Ps,
-                state.PsPressed);
-            ds4Controller.SetButtonState(
-                DualShock4SpecialButton.Touchpad,
-                state.TouchpadPressed);
-
-            var dPad = ComputeDS4Dpad(state.Buttons);
-            ds4Controller.SetDPadDirection(dPad);
-
-            ds4Controller.SetSliderValue(
-                DualShock4Slider.LeftTrigger, state.LeftTrigger);
-            ds4Controller.SetSliderValue(
-                DualShock4Slider.RightTrigger, state.RightTrigger);
 
             // DS4 raporu tetiklerin analog değerlerini ve dijital basılı
             // bitlerini ayrı alanlarda taşır. Bazı oyun bağlamları yalnızca
             // bu bitleri okuduğundan ikisini aynı final state'ten üret.
-            ds4Controller.SetButtonState(
-                DualShock4Button.TriggerLeft,
-                state.LeftTrigger > 0);
-            ds4Controller.SetButtonState(
-                DualShock4Button.TriggerRight,
-                state.RightTrigger > 0);
+            if (state.LeftTrigger > 0)
+                buttons |= DualShock4Button.TriggerLeft.Value;
+            if (state.RightTrigger > 0)
+                buttons |= DualShock4Button.TriggerRight.Value;
 
-            ds4Controller.SetAxisValue(
-                DualShock4Axis.LeftThumbX, state.LeftStickX);
-            ds4Controller.SetAxisValue(
-                DualShock4Axis.LeftThumbY, state.LeftStickY);
+            report[4] = (byte)(buttons & 0xFF);
+            report[5] = (byte)(buttons >> 8);
 
-            ds4Controller.SetAxisValue(
-                DualShock4Axis.RightThumbX, state.RightStickX);
-            ds4Controller.SetAxisValue(
-                DualShock4Axis.RightThumbY, state.RightStickY);
+            byte special = 0;
+            if (state.PsPressed)
+                special |= (byte)DualShock4SpecialButton.Ps.Value;
+            if (state.TouchpadPressed)
+                special |= (byte)DualShock4SpecialButton.Touchpad.Value;
+            report[6] = special;
 
-            ds4Controller.SubmitReport();
+            report[7] = state.LeftTrigger;
+            report[8] = state.RightTrigger;
+
+            report[29] = Ds4BatteryFull;
+
+            WriteDs4Touch(report, state);
+
+            return report;
+        }
+
+        private void WriteDs4Touch(byte[] report, GamepadOutputState state)
+        {
+            bool touch1Active = state.Touch1Active;
+            bool touch2Active = state.Touch2Active;
+
+            bool sendPacket =
+                touch1Active || touch2Active ||
+                ds4Touch1WasActive || ds4Touch2WasActive;
+
+            if (!sendPacket)
+                return;
+
+            report[32] = 1;
+            report[33] = NextTouchPacketCounter();
+
+            WriteDs4Touch1Slot(report, state, touch1Active);
+            WriteDs4Touch2Slot(report, state, touch2Active);
+        }
+
+        private void WriteDs4Touch1Slot(
+            byte[] report,
+            GamepadOutputState state,
+            bool active)
+        {
+            if (active)
+            {
+                int x = Math.Clamp(state.Touch1X, 0, Ds4TouchMaxX);
+                int y = Math.Clamp(state.Touch1Y, 0, Ds4TouchMaxY);
+                int id = state.Touch1TrackingId & 0x7F;
+
+                if (!ds4Touch1WasActive)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Virtual DS4 Touch: Down X={x} Y={y} Id={id}");
+                }
+
+                WriteDs4TouchPoint(
+                    report.AsSpan(34, 4),
+                    active: true,
+                    id,
+                    x,
+                    y);
+
+                ds4Touch1WasActive = true;
+                ds4Touch1LastX = x;
+                ds4Touch1LastY = y;
+                ds4Touch1LastTrackingId = id;
+            }
+            else if (ds4Touch1WasActive)
+            {
+                // Finger-up: DS4 protokolünün beklediği inactive contact
+                // (active-low bit set) bir frame gönderilir.
+                System.Diagnostics.Debug.WriteLine(
+                    $"Virtual DS4 Touch: Up Id={ds4Touch1LastTrackingId}");
+
+                WriteDs4TouchPoint(
+                    report.AsSpan(34, 4),
+                    active: false,
+                    ds4Touch1LastTrackingId,
+                    ds4Touch1LastX,
+                    ds4Touch1LastY);
+
+                ds4Touch1WasActive = false;
+            }
+            else
+            {
+                WriteDs4TouchPoint(
+                    report.AsSpan(34, 4),
+                    active: false,
+                    trackingId: 0,
+                    x: 0,
+                    y: 0);
+            }
+        }
+
+        private void WriteDs4Touch2Slot(
+            byte[] report,
+            GamepadOutputState state,
+            bool active)
+        {
+            if (active)
+            {
+                int x = Math.Clamp(state.Touch2X, 0, Ds4TouchMaxX);
+                int y = Math.Clamp(state.Touch2Y, 0, Ds4TouchMaxY);
+                int id = state.Touch2TrackingId & 0x7F;
+
+                if (!ds4Touch2WasActive)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Virtual DS4 Touch2: Down X={x} Y={y} Id={id}");
+                }
+
+                WriteDs4TouchPoint(
+                    report.AsSpan(38, 4),
+                    active: true,
+                    id,
+                    x,
+                    y);
+
+                ds4Touch2WasActive = true;
+                ds4Touch2LastX = x;
+                ds4Touch2LastY = y;
+                ds4Touch2LastTrackingId = id;
+            }
+            else if (ds4Touch2WasActive)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Virtual DS4 Touch2: Up Id={ds4Touch2LastTrackingId}");
+
+                WriteDs4TouchPoint(
+                    report.AsSpan(38, 4),
+                    active: false,
+                    ds4Touch2LastTrackingId,
+                    ds4Touch2LastX,
+                    ds4Touch2LastY);
+
+                ds4Touch2WasActive = false;
+            }
+            else
+            {
+                WriteDs4TouchPoint(
+                    report.AsSpan(38, 4),
+                    active: false,
+                    trackingId: 0,
+                    x: 0,
+                    y: 0);
+            }
+        }
+
+        private byte NextTouchPacketCounter()
+        {
+            return ds4TouchPacketCounter++;
+        }
+
+        private void ResetDs4TouchState()
+        {
+            ds4Touch1WasActive = false;
+            ds4Touch1LastX = 0;
+            ds4Touch1LastY = 0;
+            ds4Touch1LastTrackingId = 0;
+
+            ds4Touch2WasActive = false;
+            ds4Touch2LastX = 0;
+            ds4Touch2LastY = 0;
+            ds4Touch2LastTrackingId = 0;
+        }
+
+        public static void WriteDs4TouchPoint(
+            Span<byte> touchPoint,
+            bool active,
+            int trackingId,
+            int x,
+            int y)
+        {
+            int clampedX = Math.Clamp(x, 0, Ds4TouchMaxX);
+            int clampedY = Math.Clamp(y, 0, Ds4TouchMaxY);
+            int id = trackingId & 0x7F;
+
+            touchPoint[0] = active
+                ? (byte)id
+                : (byte)(Ds4TouchContactInactive | id);
+            touchPoint[1] = (byte)(clampedX & 0xFF);
+            touchPoint[2] = (byte)(
+                ((clampedX >> 8) & 0x0F) |
+                ((clampedY & 0x0F) << 4));
+            touchPoint[3] = (byte)((clampedY >> 4) & 0xFF);
         }
 
         private static DualShock4DPadDirection ComputeDS4Dpad(
