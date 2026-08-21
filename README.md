@@ -23,6 +23,13 @@ The application includes controller profiles, button and analog-direction remapp
 - Analog sensitivity adjustment
 - Vibration strength control
 - DualShock 4 lightbar customization
+- DualShock 4 touchpad support (USB and Bluetooth)
+- Single-touch and dual-touch tracking
+- Native touch forwarding to the virtual DualShock 4
+- Touchpad swipe detection (Up / Down / Left / Right)
+- Animated touch trail in the Gamepad Tester, following the selected lightbar color
+- Touchpad modes: Normal, Mouse, Disabled (saved per profile)
+- Mouse mode: touchpad controls the Windows cursor; touchpad click acts as left mouse click
 - Live virtual-output gamepad tester
 - Windows startup support
 - System tray mode
@@ -68,13 +75,13 @@ The application filters its own ViGEm virtual devices so they cannot be detected
 The recommended version is the Windows installer from **GitHub Releases**:
 
 ```text
-aRacnid-GamepadApp-Setup-1.0.1-x64.exe
+aRacnid-GamepadApp-Setup-1.0.4-x64.exe
 ```
 
 A portable package is also available:
 
 ```text
-aRacnid-GamepadApp-1.0.1-win-x64-portable.zip
+aRacnid-GamepadApp-1.0.4-win-x64-portable.zip
 ```
 
 Release downloads are accompanied by:
@@ -113,7 +120,7 @@ The required .NET runtime files are included with the application.
 1. Download and run:
 
    ```text
-   aRacnid-GamepadApp-Setup-1.0.1-x64.exe
+   aRacnid-GamepadApp-Setup-1.0.4-x64.exe
    ```
 
 2. Complete the installer.
@@ -301,8 +308,8 @@ The project includes an automated input and regression test suite.
 Current validated result:
 
 ```text
-Normal tests:     28 / 28
-Live ViGEm tests: 29 / 29
+Build:    0 errors, 0 warnings
+Tests:    37 / 37 PASS
 ```
 
 The tests cover areas including:
@@ -393,7 +400,7 @@ dotnet run --project tests\GamepadApp.InputTests\GamepadApp.InputTests.csproj -c
 The release script generates a self-contained `win-x64` build.
 
 ```powershell
-.\scripts\build-release.ps1 -Version 1.0.1
+.\scripts\build-release.ps1 -Version 1.0.4
 ```
 
 The script produces:
@@ -401,8 +408,8 @@ The script produces:
 ```text
 artifacts\
 ├── installer\
-│   └── aRacnid-GamepadApp-Setup-1.0.1-x64.exe
-├── aRacnid-GamepadApp-1.0.1-win-x64-portable.zip
+│   └── aRacnid-GamepadApp-Setup-1.0.4-x64.exe
+├── aRacnid-GamepadApp-1.0.4-win-x64-portable.zip
 ├── SHA256SUMS.txt
 └── publish\
 ```
@@ -410,7 +417,7 @@ artifacts\
 If Inno Setup is not installed:
 
 ```powershell
-.\scripts\build-release.ps1 -Version 1.0.1 -SkipInstaller
+.\scripts\build-release.ps1 -Version 1.0.4 -SkipInstaller
 ```
 
 ---
@@ -478,7 +485,7 @@ See [LICENSE](LICENSE) for the full license text.
 
 ## Status
 
-**aRacnid GamepadApp 1.0.1**
+**aRacnid GamepadApp 1.0.4**
 
 Windows x64  
 Self-contained release  
