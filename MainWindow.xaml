@@ -241,6 +241,46 @@
                                    Visibility="Collapsed"
                                    IsHitTestVisible="False"/>
 
+                            <Button x:Name="LogitechWarningButton"
+                                    Width="48"
+                                    Height="48"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Margin="18"
+                                    Background="#3A1717"
+                                    Foreground="#FF6B6B"
+                                    BorderBrush="#B64242"
+                                    BorderThickness="1"
+                                    FontSize="23"
+                                    FontWeight="Bold"
+                                    Content="⚠"
+                                    Cursor="Hand"
+                                    Visibility="Collapsed"
+                                    Click="LogitechWarningButton_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="WarningBorder"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="24">
+                                            <ContentPresenter HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="WarningBorder"
+                                                        Property="Background"
+                                                        Value="#512020"/>
+                                                <Setter TargetName="WarningBorder"
+                                                        Property="BorderBrush"
+                                                        Value="#E05A5A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
                         </Grid>
 
                     </Border>

@@ -85,7 +85,7 @@
 
         <TextBlock x:Name="UpdateMessageText"
                    Grid.Row="1"
-                   Text="aRacnid v1.0.4 kullanılabilir."
+                   Text="aRacnid v1.0.5 kullanılabilir."
                    Foreground="#D0D0D0"
                    FontSize="15"
                    Margin="0,16,0,0"

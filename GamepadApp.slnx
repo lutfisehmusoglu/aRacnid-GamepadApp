@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="GamepadApp.csproj" />
+  <Project Path="tests/GamepadApp.InputTests/GamepadApp.InputTests.csproj" />
 </Solution>

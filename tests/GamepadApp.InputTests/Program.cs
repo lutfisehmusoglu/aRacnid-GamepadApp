@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using GamepadApp;
 using GamepadApp.Models;
 using GamepadApp.Services;
 using HidSharp;
@@ -24,6 +25,10 @@ var tests = new (string Name, Action Body)[]
     ("SDL trigger conversion exhaustive", TestSdlTriggerConversion),
     ("SDL physical allowlist", TestSdlAllowlist),
     ("SDL out-of-scope and virtual rejection", TestSdlRejection),
+    ("Logitech X and D mode detection", TestLogitechModeDetection),
+    ("Logitech warning state lifecycle", TestLogitechWarningLifecycle),
+    ("Logitech warning UI contract", TestLogitechWarningUiContract),
+    ("Logitech warning window simulation", TestLogitechWarningWindowSimulation),
     ("Mapped digital buttons drive triggers", TestDigitalToTriggerMapping),
     ("Mapped trigger sources accumulate", TestTriggerAccumulation),
     ("Mapped analog trigger drives a button", TestTriggerToButtonMapping),
@@ -625,6 +630,137 @@ static void TestSdlRejection()
     {
         Assert(!SdlGamepadClassifier.TryClassify(vid, pid, type, out _));
     }
+}
+
+static void TestLogitechModeDetection()
+{
+    var expected = new (
+        ushort Pid,
+        PhysicalControllerType Type,
+        LogitechInputMode Mode)[]
+    {
+        (0xC21D, PhysicalControllerType.LogitechF310, LogitechInputMode.XInput),
+        (0xC216, PhysicalControllerType.LogitechF310, LogitechInputMode.DirectInput),
+        (0xC21E, PhysicalControllerType.LogitechF510, LogitechInputMode.XInput),
+        (0xC218, PhysicalControllerType.LogitechF510, LogitechInputMode.DirectInput),
+        (0xC21F, PhysicalControllerType.LogitechF710, LogitechInputMode.XInput),
+        (0xC219, PhysicalControllerType.LogitechF710, LogitechInputMode.DirectInput),
+    };
+
+    foreach ((ushort pid, PhysicalControllerType type, LogitechInputMode mode)
+             in expected)
+    {
+        LogitechInputModeStatus status = LogitechInputModeDetector.Detect(
+            FakeDescriptor(type, 0x046D, pid));
+        Equal(type, status.ControllerType);
+        Equal(mode, status.InputMode);
+        Assert(status.ModelName.StartsWith("Logitech F", StringComparison.Ordinal));
+    }
+
+    Equal(
+        LogitechInputMode.None,
+        LogitechInputModeDetector.Detect(null).InputMode);
+    Equal(
+        LogitechInputMode.None,
+        LogitechInputModeDetector.Detect(
+            FakeDescriptor(PhysicalControllerType.LogitechF310, 0x045E, 0xC21D))
+            .InputMode);
+    Equal(
+        LogitechInputMode.None,
+        LogitechInputModeDetector.Detect(
+            FakeDescriptor(PhysicalControllerType.LogitechF310, 0x046D, 0xC20A))
+            .InputMode);
+}
+
+static void TestLogitechWarningLifecycle()
+{
+    var state = new LogitechInputModeWarningState();
+    PhysicalGamepadDescriptor f310X = FakeDescriptor(
+        PhysicalControllerType.LogitechF310, 0x046D, 0xC21D);
+    PhysicalGamepadDescriptor f310D = FakeDescriptor(
+        PhysicalControllerType.LogitechF310, 0x046D, 0xC216);
+    PhysicalGamepadDescriptor f510D = FakeDescriptor(
+        PhysicalControllerType.LogitechF510, 0x046D, 0xC218);
+
+    Equal(LogitechWarningTransition.None, state.Observe(null));
+    Assert(!state.IsWarningActive);
+
+    Equal(
+        LogitechWarningTransition.ShowXInputWarning,
+        state.Observe(f310X));
+    Assert(state.IsWarningActive);
+    Equal("Logitech F310", state.ActiveModelName);
+
+    Equal(LogitechWarningTransition.None, state.Observe(f310X));
+    Equal(LogitechWarningTransition.None, state.Observe(null));
+    Assert(state.IsWarningActive, "Disconnect must not dismiss an unread warning.");
+
+    Equal(LogitechWarningTransition.None, state.Observe(f510D));
+    Assert(state.IsWarningActive, "A different model must not clear the warning.");
+
+    Equal(
+        LogitechWarningTransition.DirectInputActivated,
+        state.Observe(f310D));
+    Assert(!state.IsWarningActive);
+
+    Equal(LogitechWarningTransition.None, state.Observe(f310D));
+    Equal(
+        LogitechWarningTransition.ShowXInputWarning,
+        state.Observe(f310X));
+    Assert(state.IsWarningActive);
+}
+
+static void TestLogitechWarningUiContract()
+{
+    string dialogXaml = File.ReadAllText(
+        ProjectFile("LogitechInputModeWarningWindow.xaml"));
+    string mainXaml = File.ReadAllText(ProjectFile("MainWindow.xaml"));
+
+    Assert(dialogXaml.Contains("ResizeMode=\"NoResize\"", StringComparison.Ordinal));
+    Assert(dialogXaml.Contains("ShowInTaskbar=\"False\"", StringComparison.Ordinal));
+    Assert(dialogXaml.Contains("x:Name=\"HelpLinkButton\"", StringComparison.Ordinal));
+    Assert(mainXaml.Contains("x:Name=\"LogitechWarningButton\"", StringComparison.Ordinal));
+    Assert(mainXaml.Contains("HorizontalAlignment=\"Left\"", StringComparison.Ordinal));
+    Assert(mainXaml.Contains("VerticalAlignment=\"Bottom\"", StringComparison.Ordinal));
+}
+
+static void TestLogitechWarningWindowSimulation()
+{
+    Exception? failure = null;
+    var thread = new Thread(() =>
+    {
+        try
+        {
+            var window = new LogitechInputModeWarningWindow("Logitech F310");
+            Equal(System.Windows.ResizeMode.NoResize, window.ResizeMode);
+            Assert(!window.ShowInTaskbar);
+            Equal("XInput modu algılandı", window.Title);
+
+            var helpButton = (System.Windows.Controls.Button)
+                window.FindName("HelpLinkButton");
+            Equal(System.Windows.Visibility.Visible, helpButton.Visibility);
+
+            window.ShowDirectInputActive();
+            Equal("DirectInput modu etkin", window.Title);
+            Equal(System.Windows.Visibility.Collapsed, helpButton.Visibility);
+
+            window.ShowXInputWarning("Logitech F510");
+            Equal("XInput modu algılandı", window.Title);
+            Equal(System.Windows.Visibility.Visible, helpButton.Visibility);
+            window.Close();
+        }
+        catch (Exception ex)
+        {
+            failure = ex;
+        }
+    });
+
+    thread.SetApartmentState(ApartmentState.STA);
+    thread.Start();
+    Assert(thread.Join(TimeSpan.FromSeconds(10)), "Warning UI simulation timed out.");
+
+    if (failure != null)
+        throw new InvalidOperationException("Warning UI simulation failed.", failure);
 }
 
 static void TestDigitalToTriggerMapping()
@@ -1303,6 +1439,22 @@ static byte[] CreateUsbReport()
     report[5] = 0x08; // D-pad neutral.
     report[30] = 5;
     return report;
+}
+
+static PhysicalGamepadDescriptor FakeDescriptor(
+    PhysicalControllerType type,
+    ushort vendorId,
+    ushort productId)
+{
+    return new PhysicalGamepadDescriptor(
+        $"fake-{vendorId:X4}-{productId:X4}",
+        type.ToString(),
+        type,
+        PhysicalConnectionType.USB,
+        vendorId,
+        productId,
+        SupportsRumble: false,
+        SupportsLightbar: false);
 }
 
 static string ProjectFile(params string[] parts)

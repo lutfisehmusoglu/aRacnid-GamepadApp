@@ -81,8 +81,12 @@ public partial class MainWindow : Window
     private TrayIconService? trayIcon;
     private bool isReallyClosing;
     private bool isSwitchingProfile;
+    private bool isClosed;
     private bool wasControllerConnected;
     private string lastControllerName = "";
+    private readonly LogitechInputModeWarningState logitechWarningState = new();
+    private LogitechInputModeWarningWindow? logitechWarningWindow;
+    private bool isLogitechWarningShowPending;
 
     public VirtualControllerType CurrentVirtualControllerType { get; private set; }
     private PhysicalControllerType _detectedHardwareType;
@@ -244,6 +248,7 @@ public partial class MainWindow : Window
     object? sender,
     EventArgs e)
     {
+        isClosed = true;
         deviceTimer.Stop();
 
         LocalizationService.Instance.LanguageChanged -=
@@ -323,6 +328,9 @@ public partial class MainWindow : Window
         BatteryLabelText.Text = loc.Get("gamepad.battery");
         NoControllerText.Text = loc.Get("gamepad.no_controller");
         ControllerStatusText.Text = loc.Get("gamepad.no_controller");
+        LogitechWarningButton.ToolTip =
+            loc.Get("logitech.warning_tooltip");
+        logitechWarningWindow?.RefreshLocalization();
 
         ApplySettingsToUi();
         ApplyColorTabLocalization();
@@ -1120,6 +1128,8 @@ public partial class MainWindow : Window
             DeviceInfoPanel.Opacity = 1;
             DeviceInfoPanel.IsEnabled = true;
 
+            UpdateLogitechInputModeWarning(descriptor);
+
             RefreshControllerImage();
 
             ControllerImage.Visibility =
@@ -1172,6 +1182,77 @@ public partial class MainWindow : Window
             ShowConnectionNotification(false);
             wasControllerConnected = false;
         }
+    }
+
+    private void UpdateLogitechInputModeWarning(
+        PhysicalGamepadDescriptor descriptor)
+    {
+        LogitechWarningTransition transition =
+            logitechWarningState.Observe(descriptor);
+
+        LogitechWarningButton.Visibility =
+            logitechWarningState.IsWarningActive
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+        if (transition == LogitechWarningTransition.ShowXInputWarning)
+        {
+            ScheduleLogitechInputModeWarning();
+            return;
+        }
+
+        if (transition == LogitechWarningTransition.DirectInputActivated)
+            logitechWarningWindow?.ShowDirectInputActive();
+    }
+
+    private void ScheduleLogitechInputModeWarning()
+    {
+        if (isLogitechWarningShowPending)
+            return;
+
+        isLogitechWarningShowPending = true;
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.ApplicationIdle,
+            new Action(() =>
+            {
+                isLogitechWarningShowPending = false;
+                if (!isClosed && logitechWarningState.IsWarningActive)
+                    ShowLogitechInputModeWarning();
+            }));
+    }
+
+    private void ShowLogitechInputModeWarning()
+    {
+        if (!logitechWarningState.IsWarningActive)
+            return;
+
+        if (logitechWarningWindow != null)
+        {
+            logitechWarningWindow.ShowXInputWarning(
+                logitechWarningState.ActiveModelName);
+            return;
+        }
+
+        var warningWindow = new LogitechInputModeWarningWindow(
+            logitechWarningState.ActiveModelName)
+        {
+            Owner = this
+        };
+
+        logitechWarningWindow = warningWindow;
+        warningWindow.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(logitechWarningWindow, warningWindow))
+                logitechWarningWindow = null;
+        };
+        warningWindow.ShowDialog();
+    }
+
+    private void LogitechWarningButton_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        ShowLogitechInputModeWarning();
     }
 
     // ============================================
@@ -1481,8 +1562,19 @@ public partial class MainWindow : Window
         object sender,
         RoutedEventArgs e)
     {
-        activeProfile.RunAtStartup = !activeProfile.RunAtStartup;
-        settingsService.SetRunAtStartup(activeProfile.RunAtStartup);
+        bool enabled = !activeProfile.RunAtStartup;
+
+        if (!settingsService.SetRunAtStartup(enabled))
+        {
+            MessageBox.Show(
+                LocalizationService.Instance.Get("advanced.startup_error"),
+                LocalizationService.Instance.Get("app.title"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        activeProfile.RunAtStartup = enabled;
         SaveActiveProfile();
 
         UpdateToggleButton(
@@ -1659,7 +1751,7 @@ public partial class MainWindow : Window
             if (result.Status != UpdateCheckStatus.UpdateAvailable)
                 return;
 
-            if (Dispatcher.HasShutdownStarted)
+            if (isClosed || Dispatcher.HasShutdownStarted)
                 return;
 
             ShowUpdateAvailableDialog(result);

@@ -257,7 +257,7 @@ public class SettingsService
         }
     }
 
-    public void SetRunAtStartup(bool enabled)
+    public bool SetRunAtStartup(bool enabled)
     {
         try
         {
@@ -267,12 +267,15 @@ public class SettingsService
                     true);
 
             if (key == null)
-                return;
+                return false;
 
             if (enabled)
             {
                 string exePath =
                     Environment.ProcessPath ?? "";
+
+                if (string.IsNullOrWhiteSpace(exePath))
+                    return false;
 
                 key.SetValue(
                     StartupValueName,
@@ -284,9 +287,12 @@ public class SettingsService
                     StartupValueName,
                     false);
             }
+
+            return true;
         }
         catch
         {
+            return false;
         }
     }
 }

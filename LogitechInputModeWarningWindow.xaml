@@ -1,0 +1,132 @@
+<Window x:Class="GamepadApp.LogitechInputModeWarningWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="XInput modu algılandı"
+        Width="520"
+        Height="390"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="#0D0D0D">
+
+    <Window.Resources>
+        <Style x:Key="WarningDialogButtonStyle"
+               TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border"
+                                        Property="Background"
+                                        Value="#333333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="StatusIconBorder"
+                    Width="46"
+                    Height="46"
+                    CornerRadius="23"
+                    Background="#3A1717"
+                    BorderBrush="#B64242"
+                    BorderThickness="1">
+                <TextBlock x:Name="StatusIconText"
+                           Text="⚠"
+                           Foreground="#FF6B6B"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+
+            <TextBlock x:Name="WarningTitleText"
+                       Grid.Column="1"
+                       Text="XInput modu algılandı"
+                       Foreground="#FF6B6B"
+                       FontSize="23"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Margin="16,0,0,0"/>
+        </Grid>
+
+        <TextBlock x:Name="WarningMessageText"
+                   Grid.Row="1"
+                   Foreground="#D8D8D8"
+                   FontSize="15"
+                   LineHeight="23"
+                   Margin="0,22,0,0"
+                   TextWrapping="Wrap"/>
+
+        <TextBlock x:Name="WarningRecommendationText"
+                   Grid.Row="2"
+                   Foreground="#BEBEBE"
+                   FontSize="15"
+                   LineHeight="23"
+                   Margin="0,13,0,0"
+                   TextWrapping="Wrap"/>
+
+        <Button x:Name="HelpLinkButton"
+                Grid.Row="3"
+                HorizontalAlignment="Left"
+                Background="Transparent"
+                BorderThickness="0"
+                Foreground="#FF7777"
+                FontSize="14"
+                FontWeight="SemiBold"
+                Padding="0"
+                Margin="0,18,0,0"
+                Cursor="Hand"
+                Click="HelpLinkButton_Click">
+            <TextBlock x:Name="HelpLinkText"
+                       Text="DirectInput moduna nasıl geçilir?"
+                       TextDecorations="Underline"/>
+        </Button>
+
+        <Button x:Name="CloseButton"
+                Grid.Row="4"
+                Content="Anladım, Kapat"
+                Width="130"
+                Height="38"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Background="#292929"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                IsDefault="True"
+                IsCancel="True"
+                Style="{StaticResource WarningDialogButtonStyle}"
+                Click="CloseButton_Click"/>
+    </Grid>
+</Window>

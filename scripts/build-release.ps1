@@ -1,6 +1,6 @@
 param(
     [ValidatePattern('^\d+\.\d+\.\d+$')]
-    [string]$Version = '1.0.1',
+    [string]$Version,
     [switch]$SkipInstaller
 )
 
@@ -9,10 +9,22 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = [System.IO.Path]::GetFullPath(
     (Join-Path $PSScriptRoot '..'))
 $projectFile = Join-Path $projectRoot 'GamepadApp.csproj'
+$solutionFile = Join-Path $projectRoot 'GamepadApp.slnx'
+$testProject = Join-Path $projectRoot 'tests\GamepadApp.InputTests\GamepadApp.InputTests.csproj'
 $artifactsRoot = Join-Path $projectRoot 'artifacts'
 $publishDirectory = Join-Path $artifactsRoot 'publish\win-x64'
 $installerDirectory = Join-Path $artifactsRoot 'installer'
 $installerScript = Join-Path $projectRoot 'installer\aRacnid-GamepadApp.iss'
+
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    [xml]$projectXml = Get-Content -LiteralPath $projectFile
+    $Version = [string]$projectXml.Project.PropertyGroup.Version |
+        Select-Object -First 1
+}
+
+if ($Version -notmatch '^\d+\.\d+\.\d+$') {
+    throw "Geçersiz proje sürümü: $Version"
+}
 
 function Assert-WorkspaceChild([string]$Path) {
     $resolved = [System.IO.Path]::GetFullPath($Path)
@@ -32,9 +44,14 @@ if (Test-Path -LiteralPath $artifactsRoot) {
 New-Item -ItemType Directory -Path $publishDirectory -Force | Out-Null
 New-Item -ItemType Directory -Path $installerDirectory -Force | Out-Null
 
-& dotnet restore $projectFile -r win-x64
+& dotnet restore $solutionFile -r win-x64
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet restore başarısız oldu: $LASTEXITCODE"
+}
+
+& dotnet run --project $testProject -c Release --no-restore
+if ($LASTEXITCODE -ne 0) {
+    throw "Giriş testleri başarısız oldu: $LASTEXITCODE"
 }
 
 & dotnet publish $projectFile `

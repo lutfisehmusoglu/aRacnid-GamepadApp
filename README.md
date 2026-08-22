@@ -75,13 +75,13 @@ The application filters its own ViGEm virtual devices so they cannot be detected
 The recommended version is the Windows installer from **GitHub Releases**:
 
 ```text
-aRacnid-GamepadApp-Setup-1.0.4-x64.exe
+aRacnid-GamepadApp-Setup-1.0.5-x64.exe
 ```
 
 A portable package is also available:
 
 ```text
-aRacnid-GamepadApp-1.0.4-win-x64-portable.zip
+aRacnid-GamepadApp-1.0.5-win-x64-portable.zip
 ```
 
 Release downloads are accompanied by:
@@ -120,7 +120,7 @@ The required .NET runtime files are included with the application.
 1. Download and run:
 
    ```text
-   aRacnid-GamepadApp-Setup-1.0.4-x64.exe
+   aRacnid-GamepadApp-Setup-1.0.5-x64.exe
    ```
 
 2. Complete the installer.
@@ -400,7 +400,7 @@ dotnet run --project tests\GamepadApp.InputTests\GamepadApp.InputTests.csproj -c
 The release script generates a self-contained `win-x64` build.
 
 ```powershell
-.\scripts\build-release.ps1 -Version 1.0.4
+.\scripts\build-release.ps1 -Version 1.0.5
 ```
 
 The script produces:
@@ -408,8 +408,8 @@ The script produces:
 ```text
 artifacts\
 ├── installer\
-│   └── aRacnid-GamepadApp-Setup-1.0.4-x64.exe
-├── aRacnid-GamepadApp-1.0.4-win-x64-portable.zip
+│   └── aRacnid-GamepadApp-Setup-1.0.5-x64.exe
+├── aRacnid-GamepadApp-1.0.5-win-x64-portable.zip
 ├── SHA256SUMS.txt
 └── publish\
 ```
@@ -417,7 +417,7 @@ artifacts\
 If Inno Setup is not installed:
 
 ```powershell
-.\scripts\build-release.ps1 -Version 1.0.4 -SkipInstaller
+.\scripts\build-release.ps1 -Version 1.0.5 -SkipInstaller
 ```
 
 ---
@@ -485,7 +485,7 @@ See [LICENSE](LICENSE) for the full license text.
 
 ## Status
 
-**aRacnid GamepadApp 1.0.4**
+**aRacnid GamepadApp 1.0.5**
 
 Windows x64  
 Self-contained release  
