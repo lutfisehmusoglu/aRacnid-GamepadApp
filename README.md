@@ -75,22 +75,16 @@ The application filters its own ViGEm virtual devices so they cannot be detected
 The recommended version is the Windows installer from **GitHub Releases**:
 
 ```text
-aRacnid-GamepadApp-Setup-1.0.5-x64.exe
+aRacnid-win-Setup.exe
 ```
 
 A portable package is also available:
 
 ```text
-aRacnid-GamepadApp-1.0.5-win-x64-portable.zip
+aRacnid-win-Portable.zip
 ```
 
-Release downloads are accompanied by:
-
-```text
-SHA256SUMS.txt
-```
-
-for file-integrity verification.
+GitHub displays the SHA-256 digest for each uploaded release asset so downloads can be verified.
 
 ---
 
@@ -120,7 +114,7 @@ The required .NET runtime files are included with the application.
 1. Download and run:
 
    ```text
-   aRacnid-GamepadApp-Setup-1.0.5-x64.exe
+   aRacnid-win-Setup.exe
    ```
 
 2. Complete the installer.
